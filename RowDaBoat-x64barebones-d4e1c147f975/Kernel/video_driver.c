@@ -173,54 +173,18 @@ char font8x8_basic[128][8] = {
 struct vbe_mode_info_structure * screen_info = 0x5C00;
 
 int MAXWIDTH = 1024;
-int startAux = 0;
-int start = 1024/2 + 2;
-int widthAux = 1024/2-1;
+int start = 0;
 int width = 1024;
 int HEIGHT = 768;
-static int actXaux = 0;
 static int actY= 765-8*1.5;
-static int endX = 504;
-static int endXaux = 1018;
-static int actX=1024/2 + 2;
+static int endX = 1024;
+static int actX=0;
 static int actYaux= 765-8*1.5 ;
 static double getMaxY = 0;
 static double currentSize;
 static double getMaxYaux = 0;
 static double currentSizeaux;
 
-void screenLine(){
-    for(int i = 1024/2; i < 1024/2 + 2; i++){
-        for(int j = 0; j < HEIGHT; j++){
-            int color[3] = { 255, 255, 255};
-            writePixel(i,j,1,color);
-        }
-    }
-}
-
-void changeScreen(){
-    int aux = startAux;
-    startAux = start;
-    start = aux;
-    aux = widthAux;
-    widthAux = width;
-    width = aux;
-    aux = actXaux;
-    actXaux = actX;
-    actX = aux;
-    aux = actYaux;
-    actYaux = actY;
-    actY = aux;
-    double aux2 = currentSizeaux;
-    currentSizeaux = currentSize;
-    currentSize = aux2;
-    aux2 = getMaxYaux;
-    getMaxYaux = getMaxY;
-    getMaxY = aux2;
-    aux = endXaux;
-    endXaux = endX;
-    endX = aux;
-}
 
 char * getPixelDataByPosition(int x, int y){
     return screen_info->framebuffer + (x + y * MAXWIDTH)*3;
@@ -298,7 +262,7 @@ void clear(){
 	}
     actX = start;
     getMaxY = 0;
-    screenLine();
+    
 }
 
 void deleteChar(){

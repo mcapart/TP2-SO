@@ -89,11 +89,7 @@ void keyboard_handler(){
                 break;
 
             default:
-                if(control == 1 && scanCode == 2){
-                    buffer[actBuffer] = -2;
-                    actBuffer++;  
-                }
-                else if(control == 1 && scanCode == 3){
+                 if(control == 1 && scanCode == 3){
                     saveReg();
                 }
                 else if(control == 1 && scanCode == 4)

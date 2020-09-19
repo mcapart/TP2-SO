@@ -256,10 +256,7 @@ int calculator(){
             buffer[n] = 0;
             deleteChar();
         }
-        else if(text[0] == -2){
-            changeApp(1);
-            return 1;
-        }
+       
         else if(text[0] == -3){
             deleteAll(n);
             n = 0;

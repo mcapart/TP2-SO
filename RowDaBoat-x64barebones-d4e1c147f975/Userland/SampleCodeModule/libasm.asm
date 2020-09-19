@@ -44,30 +44,6 @@ getChar:
     pop rbp
     ret
 
-;void changeApp();
-changeApp:
-   push rbp
-   mov rbp, rsp
-
-   mov rax, 3
-   int 80h
-
-   mov rsp, rbp
-   pop rbp
-
-    ret
-
-;void start();
-start:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 4  
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
 
 ;void deleteChar();
 deleteChar:

@@ -15,9 +15,7 @@ void deleteChar();
 
 void deleteLine();
 
-void screenLine();
 
-void changeScreen();
 
 void scroll(double size);
 

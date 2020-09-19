@@ -8,7 +8,7 @@ char * v = (char*)0xB8000 + 79 * 2;
 static int app = 1;
 int main() {
 	
-	start();
+	
 	saveReturn(1);
 	saveReturn(0);
 	initApp(app);

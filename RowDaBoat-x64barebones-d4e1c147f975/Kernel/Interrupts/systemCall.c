@@ -15,8 +15,7 @@ extern void setApp(int i);
 
 void sys_read(uint64_t rdi, char * rsi, uint64_t rdx);//rax = 1 => syscall read 
 void sys_write(uint64_t rdi, char * rsi, uint64_t rdx);//rax = 2 => syscall wirte
-void sys_changeApp(int i);//rax = 3 => syscall changeApp
-void sys_start(); //rax = 4 => syscall start
+
 void sys_delete(); //rax = 5 => syscall delete
 void sys_newLine(); //rax = 6 => syscall newLine
 void sys_currentHour(uint64_t * value);
@@ -35,10 +34,7 @@ void systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax){
                 break;
         case 2: sys_write(rdi,(char *) rsi, rdx);
                 break;
-        case 3: sys_changeApp(rdi);  
-                break;
-        case 4: sys_start();
-                break;
+       
         case 5: sys_delete();
                 break;
         case 6: sys_newLine();
@@ -74,14 +70,7 @@ void sys_write(uint64_t rdi, char * rsi, uint64_t rdx){
     writeWord(rsi, 1.5, color);
 
 }
-void sys_changeApp(int i){
-    changeScreen();
-    changeBuffer();
-    setApp(i);
-}
-void sys_start(){
-    screenLine();
-}
+
 void sys_delete(){
     deleteChar();
 }

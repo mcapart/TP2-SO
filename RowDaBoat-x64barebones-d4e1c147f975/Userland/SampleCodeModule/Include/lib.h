@@ -8,10 +8,6 @@ void print(char * c);
 
 void getChar(char * c);
 
-void changeApp(int i);
-
-void start();
- 
 void deleteChar();
 
 void newLine();

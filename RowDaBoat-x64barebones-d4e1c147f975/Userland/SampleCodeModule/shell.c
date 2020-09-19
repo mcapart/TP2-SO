@@ -274,10 +274,6 @@ int shell(){
             buffer[n] = 0;
             deleteChar();
         }
-        else if(text[0] == -2){
-            changeApp(0);
-            return 0;
-        }
        else if(text[0] == -3){
             deleteAll(n);
             n = 0;
