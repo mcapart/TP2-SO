@@ -14,6 +14,8 @@ GLOBAL getReg
 GLOBAL getMem
 GLOBAL saveReturn
 GLOBAL tryInvalidOpcode
+GLOBAL malloc
+GLOBAL free
 
 section .text
 
@@ -44,6 +46,30 @@ getChar:
     pop rbp
     ret
 
+;void * malloc(size_t size)
+malloc:
+    push rbp
+    mov rbp, rsp
+
+    
+    mov rax, 3  
+    int 80h
+    
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+free:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 4
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
 
 ;void deleteChar();
 deleteChar:
@@ -182,5 +208,6 @@ tryInvalidOpcode:
 
     mov rsp, rbp
     pop rbp
+
 
 

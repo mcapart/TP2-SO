@@ -266,6 +266,47 @@ static int startFunction(char * c){
 
 
 int shell(){
+
+    void * add;
+    add = malloc(2000);
+    if(add == 0x600000){
+        print("bien");
+        newLine();
+    }
+   
+   void * add2;
+    add2 = malloc(5060);
+    if(add2 == 0x600800){
+        print("bien");
+        newLine();
+    }
+
+    free(add);
+    char * add3 = malloc(1000);
+     if(add3 == 0x600000){
+        print("bien");
+        newLine();
+    }
+
+  
+   
+    
+         
+
+   /* void * add2;
+    add2 = malloc(4000);
+    if(add2 == 0x600800){
+        print("bien");
+        newLine();
+    
+    }
+    char vec2[10];
+    numToChar( (int) add2, vec2);
+    print(vec2);
+    newLine(); */
+
+
+
     char text[10] = {0};
     while(text[0]!= 10 && n < 70){
         getChar(text);
@@ -307,3 +348,5 @@ void reStartShell(){
     buffer[n] = 0;
     n = 0;
 }
+
+

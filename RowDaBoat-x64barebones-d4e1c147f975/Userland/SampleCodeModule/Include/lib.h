@@ -46,4 +46,8 @@ void numToCharHex(uint8_t num, char * c);
 
 void deleteAll(int n);
 
+void * malloc(uint64_t size);
+
+void free(void * add);
+
 #endif
