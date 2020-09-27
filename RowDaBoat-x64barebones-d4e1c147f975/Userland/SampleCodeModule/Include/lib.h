@@ -14,6 +14,8 @@ void newLine();
 
 void numToChar(double num, char * c);
 
+int charToNum(char * c, uint64_t * num);
+
 void getHour(uint64_t * v);
 
 void getMin(uint64_t * v);

@@ -243,6 +243,9 @@ static void tryInvalidOpcodes(){
 }
 
 static void loop(){
+
+    //Ahora esta haciendo una espera activa pero la idea es cambiarlo
+    //cuando tengamos implementado un sleep o algo por el estilo
     uint64_t pid = currentPid();
     //cada 5 o 10 segundos imprime
     uint64_t initSec;
@@ -287,13 +290,17 @@ static int startFunction(char * c){
     } 
      if(specialStrComp(c, fun[CANT_FUNC-2], arg, 0) == 0){
         newLine();
-        switch_state(arg);
+        uint64_t num;
+        charToNum(arg, &num);
+        switch_state(num);
         return 1;
         
     }
      if(specialStrComp(c, fun[CANT_FUNC-3], arg, 0) == 0){
         newLine();
-        kill(arg);
+        uint64_t num;
+        charToNum(arg, &num);
+        kill(num);
         return 1;
         
     }

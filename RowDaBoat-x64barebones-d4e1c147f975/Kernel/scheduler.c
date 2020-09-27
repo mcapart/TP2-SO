@@ -99,6 +99,7 @@ void next_process(){
 
 
 int kill(uint64_t pid){
+   
     if(pid == shell_pid){
         writeWord("You cannot kill the shell process", 1.5, errorColor);
          return 1;
@@ -163,7 +164,7 @@ void print_processes(){
             writeWord("Process BP: ", 1.5, color);
             char num2[30] = {0};
             numToChar(process_list[i].process->bp, num2);
-            writeWord(num, 1.5, color);
+            writeWord(num2, 1.5, color);
             newLine();
             newLine();
             

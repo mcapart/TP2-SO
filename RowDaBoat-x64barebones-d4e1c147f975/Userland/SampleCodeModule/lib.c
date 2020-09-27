@@ -102,6 +102,24 @@ int charToNumHex(char * d, uint8_t * num ){
     return 1;
 }
 
+int charToNum(char * d, uint64_t * num){
+    double resp = 0;
+    int i = 0;
+    for(; (d[i] >= '0' && d[i] <= '9'); i++)
+    {
+        resp += d[i] - '0';
+        resp = resp * 10;
+    }
+    if(d[i] != 0){
+        return 0;
+    }
+
+    resp = resp / 10;
+
+    *num = resp;
+    return 1;
+}
+
 void deleteAll(int n){
     while(n > 0){
         deleteChar();

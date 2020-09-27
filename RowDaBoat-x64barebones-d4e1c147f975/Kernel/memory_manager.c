@@ -5,6 +5,8 @@
 #include <video_driver.h>
 #include "lib.h"
 
+
+
 typedef struct{
     int occupied; // 0 libre 1 ocupado
     uint64_t blocks; //bloques que ocupa
