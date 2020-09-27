@@ -15,13 +15,13 @@ uint64_t usedMem = 0;
 
 
 void * malloc(uint64_t n){
-    int color1[3] = {0, 20, 255};
+   
     void *result = NULL;
     if(MEM_SIZE - usedMem < n){
         return result;
     }
     int blocksNeeded = n/BLOCK_SIZE + 1; 
-    int i =0;
+    uint64_t i =0;
     for(int count = 0;i<BITMAP_SIZE && count < blocksNeeded;i++){
         if(!bitmap[i].occupied){
              
@@ -42,14 +42,9 @@ void * malloc(uint64_t n){
         bitmap[i+j].occupied = 1;
         bitmap[i+j].blocks = blocksNeeded;
     }
-    result = START_MM + (i * BLOCK_SIZE);
+    result = (void *) (START_MM + (i * BLOCK_SIZE));
     usedMem += n;
 
-    char * vec[10];
-    numToChar((int)result, vec);
-    int color[3] = {0, 255, 255};
-    writeWord(vec, 1.5, color) ;
-    newLine();
 
 
     return result;
@@ -57,7 +52,7 @@ void * malloc(uint64_t n){
 
 void free( void * add){
 
-    int pos = ((int)add - START_MM)/BLOCK_SIZE;
+    int pos = ((uint64_t)add - START_MM)/BLOCK_SIZE;
     int blocksNeeded = bitmap[pos].blocks;
     for(int i =0;i<blocksNeeded;i++){
         bitmap[pos + i].occupied = 0;

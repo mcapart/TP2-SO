@@ -2,31 +2,15 @@
 #include <lib.h>
 #include <calculator.h>
 #include <shell.h>
+#include <lib.h>
 
 char * v = (char*)0xB8000 + 79 * 2;
 
-static int app = 1;
 int main() {
-	
-	
-	saveReturn(1);
-	saveReturn(0);
-	initApp(app);
-
+	print("estoy en el main");
 	while(1){
-		switch (app)
-		{
-		case 0 : app = calculator();
-			break;	
-		case 1 : app = shell();
-			break;
-		default:
-			break;
-		}
-		
+		shell();
 	}
 	return 0;
-
-
 
 }

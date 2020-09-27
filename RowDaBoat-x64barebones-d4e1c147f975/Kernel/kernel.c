@@ -5,6 +5,8 @@
 #include <idtLoader.h>
 #include <keyboardDriver.h>
 #include "video_driver.h"
+#include <scheduler.h>
+#include <interrupts.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -53,8 +55,14 @@ int main()
 	load_idt();
 
 	
+
+
+	schedulerInitializer();
+	int color[3] = {255,255,255};
+	writeWord("hola 1",1.5, color);
+	newLine();
+	_hlt();
 	
-	((EntryPoint)sampleCodeModuleAddress)();
 		
 	return 0;
 }

@@ -1,6 +1,6 @@
 #include <lib.h>
 #include <stdint.h>
-#include <shell.h>
+#include <shell.h>  
 #define CANT_FUNC 8
 
 char fun[CANT_FUNC][40] = {"get time","get cpu info", "get cpu temperature", "inforeg", "try divide", "try invalid opcode", "help", "printMem"};
@@ -266,47 +266,7 @@ static int startFunction(char * c){
 
 
 int shell(){
-
-    void * add;
-    add = malloc(2000);
-    if(add == 0x600000){
-        print("bien");
-        newLine();
-    }
-   
-   void * add2;
-    add2 = malloc(5060);
-    if(add2 == 0x600800){
-        print("bien");
-        newLine();
-    }
-
-    free(add);
-    char * add3 = malloc(1000);
-     if(add3 == 0x600000){
-        print("bien");
-        newLine();
-    }
-
-  
-   
-    
-         
-
-   /* void * add2;
-    add2 = malloc(4000);
-    if(add2 == 0x600800){
-        print("bien");
-        newLine();
-    
-    }
-    char vec2[10];
-    numToChar( (int) add2, vec2);
-    print(vec2);
-    newLine(); */
-
-
-
+    print("Estoy en la shell");
     char text[10] = {0};
     while(text[0]!= 10 && n < 70){
         getChar(text);
@@ -338,10 +298,9 @@ int shell(){
     n = 0;
     buffer[0] = 0;
     text[0] = 0;
-
-
-   return 1;
     
+    
+    return -1;
 }
 
 void reStartShell(){

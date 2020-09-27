@@ -1,5 +1,15 @@
 #include <stdint.h>
 
+void printIp(uint64_t v){
+    char num[30];
+    char errorColor[3] = {0,0,255};
+    writeWord("ip es:", 1.5, errorColor);
+    newLine();
+    numToChar(v, num);
+    writeWord(num, 1.5, errorColor);
+    newLine();
+}
+
 void * memset(void * destination, int32_t c, uint64_t length)
 {
 	uint8_t chr = (uint8_t)c;

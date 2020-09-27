@@ -6,7 +6,9 @@
 #define BLOCK_SIZE 1024 
 #define BITMAP_SIZE (MEM_SIZE/BLOCK_SIZE)
 
-void * malloc(UINT64_t);
+#include <stdint.h>
+
+void * malloc(uint64_t n);
 void free(void * add);
 
 

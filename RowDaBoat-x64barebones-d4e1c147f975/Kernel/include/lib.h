@@ -22,4 +22,6 @@ void getMemory(uint8_t * v);
 
 void numToChar(double v, char * text);
 
+void printIp(uint64_t v);
+
 #endif

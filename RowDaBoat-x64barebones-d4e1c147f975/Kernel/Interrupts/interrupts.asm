@@ -9,6 +9,7 @@ GLOBAL setApp
 GLOBAL setRegCalc
 GLOBAL setRegShell
 GLOBAL getErrorRIP
+GLOBAL timer_interruption
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
@@ -25,7 +26,7 @@ GLOBAL _exception6Handler
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
 EXTERN systemCall
-
+EXTERN printIp
 SECTION .text
 
 %macro pushState 0
@@ -66,10 +67,13 @@ SECTION .text
 
 %macro irqHandlerMaster 1
 
+	
 	pushState
-
+	
 	mov rdi, %1 ; pasaje de parametro
+	mov rsi, rsp
 	call irqDispatcher
+	mov rsp,rax
 
 	; signal pic EOI (End of Interrupt)
 	mov al, 20h
@@ -232,6 +236,9 @@ getErrorRIP:
 	mov rsp, rbp
 	pop rbp
 	ret
+
+timer_interruption:
+	int 20h
 
 SECTION .bss
 	aux resq 1

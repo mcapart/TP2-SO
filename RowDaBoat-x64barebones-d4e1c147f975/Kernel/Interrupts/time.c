@@ -4,7 +4,10 @@
 static unsigned long ticks = 0;
 
 void timer_handler() {
+	int color[3]= {255,255,255};
 	ticks++;
+	//writeWord("timer", 1.5, color);
+	//newLine();
 }
 
 int ticks_elapsed() {
