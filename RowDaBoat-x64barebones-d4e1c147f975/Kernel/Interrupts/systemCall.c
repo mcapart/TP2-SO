@@ -3,6 +3,7 @@
 #include <keyboardDriver.h> 
 #include <lib.h>
 #include <memory_manager.h>
+#include <scheduler.h>
 
 
 extern uint8_t getHou();
@@ -30,14 +31,13 @@ void sys_getMem(uint8_t mem, uint8_t * v);
 void sys_saveReturn(uint64_t rip, uint64_t rbp, int app);
 
 
-void systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax){
+uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax){
     switch(rax){
         case 1: sys_read(rdi, (char *) rsi, rdx);
                 break;
         case 2: sys_write(rdi,(char *) rsi, rdx);
                 break;
         case 3: return malloc(rdi);
-                break;
         case 4: free(rdi);
                 break;      
         case 5: sys_delete();
@@ -62,7 +62,14 @@ void systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax){
                 break;
         case 15: sys_saveReturn(rdi, rsi, rdx);
                 break;
+        case 16: return create_proces(rdi, rsi, rdx);
+        case 17: return kill(rdi);
+        case 18: print_processes();
+                break;
+        case 19: return switch_state(rdi);  
+        case 20: return currentPid();    
     }
+    return 0;
 }
 
 

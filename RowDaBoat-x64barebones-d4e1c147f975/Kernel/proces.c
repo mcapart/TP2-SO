@@ -21,6 +21,7 @@ int pid=0;
 
 void process_wrapper(int codeEntry(uint64_t argc, uint64_t argv), uint64_t argc, uint64_t argv, int program_pid){
     codeEntry(argc, argv);
+    kill(program_pid);
 }
 
 int create_proces(uint64_t codeEntry, int argc, uint64_t argv){
@@ -50,10 +51,10 @@ int create_proces(uint64_t codeEntry, int argc, uint64_t argv){
 uint64_t initializeStack(uint64_t stack, uint64_t code, uint64_t argc, uint64_t argv, uint64_t pid){
     uint64_t sp = stack-20*8;
     initStack[ARGC] = argc;
-    initStack[ARGV] = argv;
+    initStack[ARGV] = code;
     initStack[STACK] = stack;
     initStack[PID] = pid;
-    initStack[RIP] =  code;
+    initStack[RIP] =  (uint64_t)process_wrapper;
     memcpy((uint64_t*)sp, initStack, 20*8);
     return sp;
 }

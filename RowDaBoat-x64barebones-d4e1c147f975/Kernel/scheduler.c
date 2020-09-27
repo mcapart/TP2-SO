@@ -11,27 +11,6 @@ int static color[3]= {255, 255, 255};
 
 static processState process_list[MAX_PROCESSES];
 
-
-void func(){
-    int i = 0;
-    while(1){
-        if(i%5 == 0){
-            newLine();
-            writeWord("Estoy en el otro proceso", 1.5, errorColor);
-            newLine();
-            writeWord("-------", 1.5, color);
-            newLine();
-        
-        }
-        i++;
-        if(i==70){
-            kill(func_pid);
-        }
-    }
-}
-
-
-
 void schedulerInitializer(){
     for(int i=0;i<MAX_PROCESSES;i++){
         process_list[i].state = EMPTY;
@@ -76,11 +55,6 @@ int find_place(){
 }
 
 uint64_t scheduler(uint64_t sp){
-    /*char num2[30]; 
-    numToChar(sp, num2);
-    writeWord(num2, 1.5, errorColor);
-    newLine(); */
-   
     
     if(cant_process == 0){
          writeWord("There are no processes", 1.5, errorColor);
@@ -89,7 +63,6 @@ uint64_t scheduler(uint64_t sp){
     
     if(first_time){
         first_time--;
-        func_pid = create_proces((uint64_t)&func, 1, (uint64_t) "func");
     }
     else{
         process_list[iterator].process->sp = sp;
@@ -99,6 +72,10 @@ uint64_t scheduler(uint64_t sp){
     next_process();
    
     return process_list[iterator].process->sp;
+}
+
+uint64_t currentPid(){
+    return process_list[iterator].process->pid;
 }
 
 int process_is_available(processState p){
@@ -184,9 +161,11 @@ void print_processes(){
             writeWord(state_to_string(process_list[i].state), 1.5, color);
             newLine();
             writeWord("Process BP: ", 1.5, color);
-            char num2[10] = {0};
+            char num2[30] = {0};
             numToChar(process_list[i].process->bp, num2);
             writeWord(num, 1.5, color);
+            newLine();
+            newLine();
             
         }
     }
@@ -215,7 +194,7 @@ int switch_state( int pid ){
     } 
     else{
         if( process_list[processIndex].state == BLOCKED ){
-            process_list[processIndex].state == AVAILABLE;
+            process_list[processIndex].state = AVAILABLE;
             return 0;
         }
 

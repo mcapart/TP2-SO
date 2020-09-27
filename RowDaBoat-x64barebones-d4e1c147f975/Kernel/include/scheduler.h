@@ -28,5 +28,6 @@ void next_process();
 void print_processes();
 char * state_to_string(uint8_t state);
 int switch_state( int pid );
+uint64_t currentPid();
 
 #endif

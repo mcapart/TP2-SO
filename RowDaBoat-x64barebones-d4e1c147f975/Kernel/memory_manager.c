@@ -45,21 +45,15 @@ void * malloc(uint64_t n){
     result = (void *) (START_MM + (i * BLOCK_SIZE));
     usedMem += n;
 
-
-
     return result;
 }
 
 void free( void * add){
-
     int pos = ((uint64_t)add - START_MM)/BLOCK_SIZE;
     int blocksNeeded = bitmap[pos].blocks;
     for(int i =0;i<blocksNeeded;i++){
         bitmap[pos + i].occupied = 0;
-    }
-
-    
-    
+    } 
 }
 
 

@@ -50,4 +50,14 @@ void * malloc(uint64_t size);
 
 void free(void * add);
 
+uint64_t create_process(uint64_t codeEntry, uint64_t argc, uint64_t argv);
+
+uint64_t kill(uint64_t pid);
+
+void ps();
+
+uint64_t switch_state(uint64_t pid);
+
+uint64_t currentPid();
+
 #endif

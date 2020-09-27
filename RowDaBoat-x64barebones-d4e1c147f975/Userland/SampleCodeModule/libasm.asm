@@ -16,6 +16,11 @@ GLOBAL saveReturn
 GLOBAL tryInvalidOpcode
 GLOBAL malloc
 GLOBAL free
+GLOBAL create_process
+GLOBAL kill
+GLOBAL ps
+GLOBAL switch_state
+GLOBAL currentPid
 
 section .text
 
@@ -200,6 +205,67 @@ saveReturn:
     pop rbp
     ret
 
+;uint64_t create_process(uint64_t codeEntry, uint64_t argc, uint64_t argv)
+create_process:
+    push rbp
+    mov rbp, rsp
+    
+    mov rax, 16
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+    
+;uint64_t kill(uint64_t pid);
+kill:
+    push rbp 
+    mov rbp, rsp
+    
+    mov rax, 17
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;void ps();
+ps:
+    push rbp
+    mov rbp, rsp
+    
+    mov rax, 18
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;uint64_t switch_state(uint64_t pid);
+switch_state:
+    push rbp
+    mov rbp, rsp
+ 
+    mov rax, 19
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;uint64_t currentPid();
+currentPid:
+    push rbp
+    mov rbp, rsp
+ 
+    mov rax, 20
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+
 tryInvalidOpcode:
     push rbp
     mov rbp, rsp
@@ -208,6 +274,8 @@ tryInvalidOpcode:
 
     mov rsp, rbp
     pop rbp
+
+
 
 
 

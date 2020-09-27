@@ -1,10 +1,37 @@
 #include <lib.h>
 #include <stdint.h>
 #include <shell.h>  
-#define CANT_FUNC 8
+#define CANT_FUNC 12
 
-char fun[CANT_FUNC][40] = {"get time","get cpu info", "get cpu temperature", "inforeg", "try divide", "try invalid opcode", "help", "printMem"};
-char descFun[CANT_FUNC][100] = {": Imprime la hora actual del sistema", ": Imprime informacion del cpu", ": Imprime la temperatura del cpu", ": Imprime el contenido de los registros cuando fueron guardados", ": ejemplo de excepcion de dividir por 0", ": ejemplo de excepcion de codigo invalido", ": Imprime las funciones disponibles y su descripcion", ": Volcado de memoria desde la posicion pasada como argumento"};
+char fun[CANT_FUNC][40] = {
+    "get time",
+    "get cpu info", 
+    "get cpu temperature", 
+    "inforeg", 
+    "try divide", 
+    "try invalid opcode", 
+    "help", 
+    "ps", 
+    "loop", 
+    "kill", 
+    "block",
+    "printMem" 
+    };
+char descFun[CANT_FUNC][100] = {
+    ": Imprime la hora actual del sistema", 
+    ": Imprime informacion del cpu", 
+    ": Imprime la temperatura del cpu", 
+    ": Imprime el contenido de los registros cuando fueron guardados",
+    ": Ejemplo de excepcion de dividir por 0",
+    ": Ejemplo de excepcion de codigo invalido", 
+    ": Imprime las funciones disponibles y su descripcion",  
+    ": Imprime una lista de todos los procesos con su pid, su estado y el BP",
+    ": Crea un proceso loop que imprime su pid despues de una cantidad de segundo",
+    ": Recibe como parametro el ID de un proceso, y lo mata",
+    ": Recibe como parametro el ID de un proceso, y lo bloquea",
+    ": Volcado de memoria desde la posicion pasada como argumento" 
+};
+
 static char buffer[70] = {0};
 static int n = 0;
 
@@ -106,11 +133,11 @@ static int strComp(char * c1, char * c2){
     return 0;
 }
 
-static int valid(char d){
-    return (d >= '0' && d <= '9') || (d>= 'a' && d <= 'f');
+static int valid(char d, int isHexa){
+    return (d >= '0' && d <= '9') || (isHexa && d>= 'a' && d <= 'f');
 }
 
-static int specialStrComp(char * c1, char * c2, char * arg){
+static int specialStrComp(char * c1, char * c2, char * arg, int isHex){
     int i = 0;
     int j = 0;
     int n = 0;
@@ -132,10 +159,10 @@ static int specialStrComp(char * c1, char * c2, char * arg){
     while(c1[j] == ' ' && c1[j] != 0){
         j++;
     }
-    if(!valid(c1[j])){
+    if(!valid(c1[j], isHex)){
         return 1;
     }
-    while(valid(c1[j])){
+    while(valid(c1[j], isHex)){
         arg[n] = c1[j];
         j++;
         n++;
@@ -215,16 +242,58 @@ static void tryInvalidOpcodes(){
     tryInvalidOpcode();
 }
 
+static void loop(){
+    uint64_t pid = currentPid();
+    //cada 5 o 10 segundos imprime
+    uint64_t initSec;
+    uint64_t sec;
+    getSec(&initSec);
+    int n = 10; //cant de segundos que espera
+    char num[20];
+    int i=0;
+    while (i<8)
+    {
+        getSec(&sec);
+        if((sec - initSec) % n == 0){
+            print("Hola! :) este es mi PID: ");
+            numToChar(pid, num);
+            print(num);
+            newLine();
+            i++;
+        }
+
+    }
+    
+}
+
+static void createLoopProces(){
+    print("Creando proceso");
+    newLine();
+    int pid = create_process((uint64_t)&loop, 1, "loop");
+}
+
 
 
 static int startFunction(char * c){ 
     int i = getFunction(c);
     char arg[20];
-    if(specialStrComp(c, fun[CANT_FUNC-1], arg) == 0){
+    if(specialStrComp(c, fun[CANT_FUNC-1], arg, 1) == 0){
         newLine();
         uint8_t num;
         charToNumHex(arg, &num);
         printMem(num);
+        return 1;
+        
+    } 
+     if(specialStrComp(c, fun[CANT_FUNC-2], arg, 0) == 0){
+        newLine();
+        switch_state(arg);
+        return 1;
+        
+    }
+     if(specialStrComp(c, fun[CANT_FUNC-3], arg, 0) == 0){
+        newLine();
+        kill(arg);
         return 1;
         
     }
@@ -258,6 +327,16 @@ static int startFunction(char * c){
         help();
         return 1;
     }
+    if(i==7){
+        ps();
+        return 1;
+    }
+    if(i==8){
+        createLoopProces();
+        return 1;
+    }
+  
+    
 
     return 0;
     
@@ -266,7 +345,7 @@ static int startFunction(char * c){
 
 
 int shell(){
-    print("Estoy en la shell");
+    
     char text[10] = {0};
     while(text[0]!= 10 && n < 70){
         getChar(text);
