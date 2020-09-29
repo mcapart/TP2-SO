@@ -58,9 +58,7 @@ int main()
 
 
 	schedulerInitializer();
-	int color[3] = {255,255,255};
-	writeWord("hola 1",1.5, color);
-	newLine();
+	
 	_hlt();
 	
 		
