@@ -9,11 +9,22 @@ int func_pid;
 int static errorColor[3] = {0, 0, 255};
 int static color[3]= {255, 255, 255};
 
+#define VAR 1
+
+typedef struct{
+    uint64_t pid;
+    uint64_t tick_left;
+}sleepingProcess;
+
 static processState process_list[MAX_PROCESSES];
+static sleepingProcess sleeping_list[MAX_PROCESSES];
 
 void schedulerInitializer(){
     for(int i=0;i<MAX_PROCESSES;i++){
         process_list[i].state = EMPTY;
+    }
+    for(int i=0;i<MAX_PROCESSES;i++){
+        sleeping_list[i].pid = -1;
     }
     cant_process = 0;
     char ** argv = malloc(16);
@@ -42,6 +53,7 @@ uint8_t addToList(processStruct *process) {
     }
     process_list[index].process = process;
     process_list[index].state = AVAILABLE;
+    process_list[index].quantum_left = process->priority * VAR;
     cant_process++;
 
     return 0;
@@ -74,7 +86,29 @@ uint64_t scheduler(uint64_t sp){
 
 
     next_process();
-   
+
+    int i;
+    for(i=0;i<MAX_PROCESSES;i++){
+        if(sleeping_list[i].pid != -1){
+            if(sleeping_list[i].tick_left >0){
+                sleeping_list[i].tick_left--;
+                writeWord("p", 1.5, errorColor);
+            }
+            else{
+                int aux = sleeping_list[i].pid;
+                sleeping_list[i].pid = -1;
+                int index = find_process(aux);
+                process_list[index].state = AVAILABLE;
+            }
+        }
+    }
+    
+   if(iterator == 0){
+       writeChar('0', 1.5, errorColor);
+   }
+   else{
+       writeChar('1',1.5,errorColor);
+   }
     return process_list[iterator].process->sp;
 }
 
@@ -88,11 +122,12 @@ int process_is_available(processState p){
 
 void next_process(){
     
-    if(process_list[iterator].quantum_left >0){
+    if(process_list[iterator].state == AVAILABLE && process_list[iterator].quantum_left >0){
         process_list[iterator].quantum_left--;
+        
         return;
     }
-    process_list[iterator].quantum_left = process_list[iterator].process->priority;
+    process_list[iterator].quantum_left = process_list[iterator].process->priority * VAR;
     iterator++;
     int i;
 
@@ -101,9 +136,11 @@ void next_process(){
     }
     if( i == MAX_PROCESSES && !process_is_available(process_list[iterator%MAX_PROCESSES])){
         iterator = 0; //retorno el proceso shell
+         
         return;
     }
     iterator = iterator % MAX_PROCESSES;
+    
     return;
 }
 
@@ -143,6 +180,27 @@ int blockProcess(uint64_t pid){
     if(process_list[iterator].process->pid == pid)
         timer_interruption();
     return 0;
+}
+
+int sleepProcess(uint64_t pid, uint64_t sec){
+    int process = find_process(pid);
+    if(process == -1){
+        writeWord("Error while blocking the process.", 1.5, errorColor);
+        return -1;
+    }
+
+    int i=0;
+    while(sleeping_list[i].pid != -1 && i<MAX_PROCESSES){
+        i++;
+    }
+    if(i == MAX_PROCESSES){
+        writeWord("ERROR", 1.5, errorColor);
+        return;
+    }
+    sleeping_list[i].pid = pid;
+    sleeping_list[i].tick_left = sec * 18;
+    
+    blockProcess(pid);
 }
 
 int find_process(uint64_t pid){

@@ -21,8 +21,14 @@ GLOBAL kill
 GLOBAL ps
 GLOBAL switch_state
 GLOBAL currentPid
+GLOBAL sleep
+GLOBAL _sti
 
 section .text
+
+_sti:
+    sti 
+    ret
 
 ; void print(char *)
 print:
@@ -259,6 +265,17 @@ currentPid:
     mov rbp, rsp
  
     mov rax, 20
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+sleep:
+    push rbp
+    mov rbp, rsp
+    
+    mov rax, 21
     int 80h
 
     mov rsp, rbp

@@ -8,13 +8,14 @@
 #include <stddef.h>
 
 
-enum process_state {HALT, AVAILABLE, BLOCKED, EMPTY};
+enum process_state {HALT, AVAILABLE, BLOCKED, EMPTY, SLEEP};
 
 typedef struct {
     processStruct * process;
     uint8_t state;
     uint8_t quantum_left;
 }processState; 
+
 
 void schedulerInitializer();
 uint8_t addToList(processStruct * process);
@@ -30,5 +31,6 @@ void print_processes();
 char * state_to_string(uint8_t state);
 int switch_state( int pid );
 uint64_t currentPid();
+int sleepProcess(uint64_t pid, uint64_t sec);
 
 #endif

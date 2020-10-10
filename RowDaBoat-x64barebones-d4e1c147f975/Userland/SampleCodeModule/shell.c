@@ -251,11 +251,12 @@ static void loop(){
     uint64_t initSec;
     uint64_t sec;
     getSec(&initSec);
-    int n = 10; //cant de segundos que espera
+    int n = 36; //cant de segundos que espera
     char num[20];
     int i=0;
     while (i<8)
     {
+        
         getSec(&sec);
         if((sec - initSec) % n == 0){
             print("Hola! :) este es mi PID: ");
