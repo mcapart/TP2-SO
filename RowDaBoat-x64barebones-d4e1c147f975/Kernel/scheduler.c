@@ -1,5 +1,5 @@
 #include <scheduler.h>
-
+#include <memory_manager.h>
 int iterator;
 int cant_process;
 int first_time = 1;
@@ -16,12 +16,15 @@ void schedulerInitializer(){
         process_list[i].state = EMPTY;
     }
     cant_process = 0;
+    char ** argv = malloc(16);
+    argv[0] = "sampleCOdeModule";
 
-    shell_pid = create_proces(0x400000, 0, (uint64_t) "sampleCodeModule");
+    shell_pid = create_proces(0x400000, 1, argv, 5);
     if(shell_pid == -1){
          writeWord("Error while creating process.", 1.5, errorColor);
          return;
     }
+
     
     iterator = 0;
     
@@ -55,6 +58,7 @@ int find_place(){
 }
 
 uint64_t scheduler(uint64_t sp){
+  
     
     if(cant_process == 0){
          writeWord("There are no processes", 1.5, errorColor);
@@ -83,6 +87,12 @@ int process_is_available(processState p){
 }
 
 void next_process(){
+    
+    if(process_list[iterator].quantum_left >0){
+        process_list[iterator].quantum_left--;
+        return;
+    }
+    process_list[iterator].quantum_left = process_list[iterator].process->priority;
     iterator++;
     int i;
 
@@ -153,11 +163,21 @@ void print_processes(){
     int i;
     for(i = 0; i < MAX_PROCESSES; i++){
         if(process_list[i].state != EMPTY){
+            writeWord("Process Name: ", 1.5, color);
+            char ** name = process_list[i].process->argv;
+            writeWord(name[0], 1.5, color);
+            newLine();
             writeWord("Process PID: ", 1.5, color);
             char num[10] = {0};
             numToChar(process_list[i].process->pid, num);
             writeWord(num, 1.5, color);
             newLine();
+            writeWord("Process Priority: ", 1.5, color);
+            char num3[10] = {0};
+            numToChar(process_list[i].process->priority, num3);
+            writeWord(num3, 1.5, color);
+            newLine();
+
             writeWord("State: ", 1.5, color);
             writeWord(state_to_string(process_list[i].state), 1.5, color);
             newLine();
@@ -165,6 +185,7 @@ void print_processes(){
             char num2[30] = {0};
             numToChar(process_list[i].process->bp, num2);
             writeWord(num2, 1.5, color);
+             
             newLine();
             newLine();
             

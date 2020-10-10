@@ -272,7 +272,9 @@ static void loop(){
 static void createLoopProces(){
     print("Creando proceso");
     newLine();
-    int pid = create_process((uint64_t)&loop, 1, "loop");
+    char ** argv = malloc(16);
+    argv[0] = "loop";
+    int pid = create_process((uint64_t)&loop, 1, argv, 1);
 }
 
 

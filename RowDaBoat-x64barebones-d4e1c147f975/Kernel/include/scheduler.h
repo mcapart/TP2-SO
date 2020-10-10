@@ -13,6 +13,7 @@ enum process_state {HALT, AVAILABLE, BLOCKED, EMPTY};
 typedef struct {
     processStruct * process;
     uint8_t state;
+    uint8_t quantum_left;
 }processState; 
 
 void schedulerInitializer();

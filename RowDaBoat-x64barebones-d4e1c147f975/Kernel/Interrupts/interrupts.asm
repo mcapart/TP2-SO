@@ -143,10 +143,10 @@ picSlaveMask:
 int_80h:
 	push rbp
 	mov rbp, rsp
-	push rcx
-	mov rcx, rax
+	push r8
+	mov r8, rax
 	call systemCall
-	pop rcx
+	pop r8
 	mov rsp, rbp
 	pop rbp 
 	sti
