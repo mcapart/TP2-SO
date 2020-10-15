@@ -248,24 +248,23 @@ static void loop(){
     //cuando tengamos implementado un sleep o algo por el estilo
     uint64_t pid = currentPid();
     //cada 5 o 10 segundos imprime
-    uint64_t initSec;
-    uint64_t sec;
-    getSec(&initSec);
-    int n = 36; //cant de segundos que espera
+   
     char num[20];
     int i=0;
-    while (i<8)
+    uint64_t j;
+    while (i<15)
     {
-        
-        getSec(&sec);
-        if((sec - initSec) % n == 0){
-            print("Hola! :) este es mi PID: ");
-            numToChar(pid, num);
-            print(num);
-            newLine();
-            i++;
+        j=0;
+        while(j<99999999){
+            j++;
         }
-
+        newLine();
+        print("Hola! :) este es mi PID: ");
+        numToChar(pid, num);
+        print(num);
+        newLine();
+        i++;
+        
     }
     
 }
@@ -355,7 +354,7 @@ static int startFunction(char * c){
 
 
 int shell(){
-    
+    print("> ");
     char text[10] = {0};
     while(text[0]!= 10 && n < 70){
         getChar(text);
