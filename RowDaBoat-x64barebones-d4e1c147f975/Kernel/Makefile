@@ -18,6 +18,7 @@ all: $(KERNEL)
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_INTERRUPTS) $(OBJECTS_INTERRUPTS_ASM)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $^
+	$(LD) $(LDFLAGS) -T kernel.ld --oformat=elf64-x86-64 -o kernel.elf $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM) $(OBJECTS_INTERRUPTS) $(OBJECTS_INTERRUPTS_ASM)
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -I./Interrupts -c $< -o $@
