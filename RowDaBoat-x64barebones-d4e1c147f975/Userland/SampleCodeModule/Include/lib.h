@@ -62,7 +62,7 @@ uint64_t switch_state(uint64_t pid);
 
 uint64_t currentPid();
 
-int sleep(uint64_t pid, uint64_t sec);
+int sleep(uint64_t sec);
 void _sti();
 
 #endif

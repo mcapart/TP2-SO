@@ -92,7 +92,7 @@ uint64_t scheduler(uint64_t sp){
         if(sleeping_list[i].pid != -1){
             if(sleeping_list[i].tick_left >0){
                 sleeping_list[i].tick_left--;
-                writeWord("p", 1.5, errorColor);
+                //writeWord("p", 1.5, errorColor);
             }
             else{
                 int aux = sleeping_list[i].pid;
@@ -103,12 +103,12 @@ uint64_t scheduler(uint64_t sp){
         }
     }
     
-   if(iterator == 0){
+   /*if(iterator == 0){
        writeChar('0', 1.5, errorColor);
    }
    else{
        writeChar('1',1.5,errorColor);
-   }
+   }*/
     return process_list[iterator].process->sp;
 }
 
@@ -182,25 +182,19 @@ int blockProcess(uint64_t pid){
     return 0;
 }
 
-int sleepProcess(uint64_t pid, uint64_t sec){
-    int process = find_process(pid);
-    if(process == -1){
-        writeWord("Error while blocking the process.", 1.5, errorColor);
-        return -1;
-    }
-
+int sleepProcess(uint64_t sec){
     int i=0;
     while(sleeping_list[i].pid != -1 && i<MAX_PROCESSES){
         i++;
     }
     if(i == MAX_PROCESSES){
         writeWord("ERROR", 1.5, errorColor);
-        return;
+        return 1;
     }
-    sleeping_list[i].pid = pid;
+    sleeping_list[i].pid = process_list[iterator].process->pid;
     sleeping_list[i].tick_left = sec * 18;
     
-    blockProcess(pid);
+    blockProcess(process_list[iterator].process->pid);
 }
 
 int find_process(uint64_t pid){

@@ -29,7 +29,7 @@ void sys_saveReg();
 void sys_getReg(uint64_t * v);
 void sys_getMem(uint8_t mem, uint8_t * v);
 void sys_saveReturn(uint64_t rip, uint64_t rbp, int app);
-void sys_sleep(uint64_t rdi, uint64_t rsi);
+void sys_sleep(uint64_t rdi);
 
 
 uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uint64_t rax){
@@ -69,7 +69,7 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;
         case 19: return switch_state(rdi);  
         case 20: return currentPid();
-        case 21: sys_sleep(rdi, rsi);
+        case 21: sys_sleep(rdi);
                 break;    
     }
     return 0;
@@ -140,8 +140,8 @@ void sys_saveReturn(uint64_t rip, uint64_t rbp, int app){
     }
 }
 
-void sys_sleep(uint64_t rdi, uint64_t rsi){
+void sys_sleep(uint64_t rdi){
     _sti();
-    sleepProcess(rdi, rsi);
+    sleepProcess(rdi);
 }
 

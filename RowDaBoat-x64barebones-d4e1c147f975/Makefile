@@ -1,11 +1,15 @@
 
 all:  bootloader kernel userland image
 
+buddy: bootloader kerbud userland image
+
 bootloader:
 	cd Bootloader; make all
 
 kernel:
-	cd Kernel; make all
+	cd Kernel; make mm=BITMAP all
+kerbud:
+	cd Kernel; make mm=BUDDY all
 
 userland:
 	cd Userland; make all
