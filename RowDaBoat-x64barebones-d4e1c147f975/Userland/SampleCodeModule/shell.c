@@ -1,7 +1,7 @@
 #include <lib.h>
 #include <stdint.h>
 #include <shell.h>  
-#define CANT_FUNC 12
+#define CANT_FUNC 13
 
 char fun[CANT_FUNC][40] = {
     "get time",
@@ -12,7 +12,8 @@ char fun[CANT_FUNC][40] = {
     "try invalid opcode", 
     "help", 
     "ps", 
-    "loop", 
+    "loop",
+    "nice", 
     "kill", 
     "block",
     "printMem" 
@@ -27,6 +28,7 @@ char descFun[CANT_FUNC][100] = {
     ": Imprime las funciones disponibles y su descripcion",  
     ": Imprime una lista de todos los procesos con su pid, su estado y el BP",
     ": Crea un proceso loop que imprime su pid despues de una cantidad de segundo",
+    ":Recibe como parametro el ID de un proceso y una nueva prioridad y le asgina a ese procesos esa prioridad",
     ": Recibe como parametro el ID de un proceso, y lo mata",
     ": Recibe como parametro el ID de un proceso, y lo bloquea",
     ": Volcado de memoria desde la posicion pasada como argumento" 
@@ -178,6 +180,61 @@ static int specialStrComp(char * c1, char * c2, char * arg, int isHex){
     return 0;
 }
 
+static int specialStrComp2(char * c1, char * c2, char * arg1, char * arg2, int isHex){
+    int i = 0;
+    int j = 0;
+    int n = 0;
+    int s =0;
+    while(c1[j] == ' ' && c1[j] != 0){
+            j++;
+    }
+    for(; c1[j] != 0 && c2[i] != 0; i++, j++){
+        if(c1[j] != c2[i]){
+            return c1[j] - c2[i];
+        }
+    }
+    if (c2[i])
+    {
+        return -1;
+    }
+    if(c1[j] != ' '){
+        return 1;
+    }
+    while(c1[j] == ' ' && c1[j] != 0){
+        j++;
+    }
+    if(!valid(c1[j], isHex)){
+        return 1;
+    }
+    while(valid(c1[j], isHex)){
+        arg1[n] = c1[j];
+        j++;
+        n++;
+    }
+    while(c1[j] == ' ' && c1[j] != 0){
+        j++;
+    }
+    arg1[n] = 0;
+    if(!valid(c1[j], isHex)){
+        return 1;
+    }
+    while(valid(c1[j], isHex)){
+        arg2[s] = c1[j];
+        j++;
+        s++;
+    }
+      while(c1[j] == ' ' && c1[j] != 0){
+        j++;
+    }
+  
+    if (c1[j])
+    {
+        return 1;
+    }
+    arg2[s] = 0;
+    return 0;
+}
+
 static int getFunction(char * c){
     for(int i = 0; i < CANT_FUNC - 1; i++){
         if(strComp(c,fun[i]) == 0){
@@ -282,6 +339,7 @@ static void createLoopProces(){
 static int startFunction(char * c){ 
     int i = getFunction(c);
     char arg[20];
+    char arg2[20];
     if(specialStrComp(c, fun[CANT_FUNC-1], arg, 1) == 0){
         newLine();
         uint8_t num;
@@ -303,6 +361,16 @@ static int startFunction(char * c){
         uint64_t num;
         charToNum(arg, &num);
         kill(num);
+        return 1;
+        
+    }
+      if(specialStrComp2(c, fun[CANT_FUNC-4], arg, arg2, 0) == 0){
+        newLine();
+        uint64_t pid;
+        charToNum(arg, &pid);
+        uint64_t num;
+        charToNum(arg2, &num);
+        changePriority(pid, num);
         return 1;
         
     }

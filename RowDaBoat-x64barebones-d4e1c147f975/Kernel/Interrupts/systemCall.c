@@ -70,7 +70,8 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
         case 19: return switch_state(rdi);  
         case 20: return currentPid();
         case 21: sys_sleep(rdi);
-                break;    
+                break;   
+        case 22: return changePriority(rdi, rsi); 
     }
     return 0;
 }

@@ -32,5 +32,6 @@ char * state_to_string(uint8_t state);
 int switch_state( int pid );
 uint64_t currentPid();
 int sleepProcess(uint64_t sec);
+int changePriority(uint64_t pid, uint8_t newPriority );
 
 #endif

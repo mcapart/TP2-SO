@@ -9,7 +9,7 @@ int func_pid;
 int static errorColor[3] = {0, 0, 255};
 int static color[3]= {255, 255, 255};
 
-#define VAR 1
+#define VAR 25
 
 typedef struct{
     uint64_t pid;
@@ -167,7 +167,20 @@ int kill(uint64_t pid){
 
 }
 
+int changePriority(uint64_t pid, uint8_t newPriority ){
+    int process = find_process(pid);
+    if(process == -1){
+        writeWord("THat process does not exist", 1.5, errorColor);
+        return -1;
+    }
+    if(newPriority<=0 || newPriority > PRIORITY_MAX){
+        writeWord("That priority does not exist", 1.5, errorColor);
+        return -1;
+    }
+    process_list[process].process->priority = newPriority;
+    return 0;
 
+}
 
 int blockProcess(uint64_t pid){
     int process = find_process(pid);
@@ -237,7 +250,12 @@ void print_processes(){
             char num2[30] = {0};
             numToChar(process_list[i].process->bp, num2);
             writeWord(num2, 1.5, color);
-             
+            newLine();
+            writeWord("Process SP: ", 1.5, color);
+            char num4[30] = {0};
+            numToChar(process_list[i].process->sp, num4);
+            writeWord(num4, 1.5, color);
+
             newLine();
             newLine();
             

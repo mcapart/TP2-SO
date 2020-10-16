@@ -23,6 +23,7 @@ GLOBAL switch_state
 GLOBAL currentPid
 GLOBAL sleep
 GLOBAL _sti
+GLOBAL changePriority
 
 section .text
 
@@ -282,6 +283,17 @@ sleep:
     pop rbp
     ret
 
+;int changePriority(uint64_t pid, uint8_t newPriority)
+changePriority:
+    push rbp
+    mov rbp, rsp
+    
+    mov rax, 22
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
 
 tryInvalidOpcode:
     push rbp

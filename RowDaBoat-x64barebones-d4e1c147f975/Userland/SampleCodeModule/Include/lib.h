@@ -65,4 +65,6 @@ uint64_t currentPid();
 int sleep(uint64_t sec);
 void _sti();
 
+int changePriority(uint64_t pid, uint8_t newPriority);
+
 #endif

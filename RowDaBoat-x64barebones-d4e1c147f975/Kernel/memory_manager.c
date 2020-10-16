@@ -58,9 +58,6 @@ void * mallocRec(uint64_t size, unsigned int node, uint64_t current_size, void *
 }
 
 void * malloc(uint64_t size){
-    int color ={255, 255, 255};
-    writeWord("buddy", 1.5, color);
-    newLine();
    if(memory_tree[0] == USED ||  MEM_SIZE - memory_used < size){
        return NULL;
    }
