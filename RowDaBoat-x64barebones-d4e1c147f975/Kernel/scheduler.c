@@ -19,6 +19,8 @@ typedef struct{
 static processState process_list[MAX_PROCESSES];
 static sleepingProcess sleeping_list[MAX_PROCESSES];
 
+static int find_place();
+
 void schedulerInitializer(){
     for(int i=0;i<MAX_PROCESSES;i++){
         process_list[i].state = EMPTY;
@@ -292,5 +294,17 @@ int switch_state( int pid ){
 
         blockProcess(pid);
         return 0;
+    }
+}
+
+int make_available(int pid){
+    int processIndex = find_process(pid);
+    if(processIndex == -1){
+        writeWord("Error. The PID given is unknown\n", 1.5, errorColor);
+        return 1;
+    } 
+    else{
+       process_list[processIndex].state = AVAILABLE;
+       return 0;
     }
 }

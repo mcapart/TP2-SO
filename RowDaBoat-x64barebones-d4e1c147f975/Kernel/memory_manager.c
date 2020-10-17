@@ -13,6 +13,10 @@
 static uint8_t memory_tree[NODES] = {FREE};
 static uint64_t memory_used = 0;
 
+static uint64_t usedMem(){
+    return memory_used;
+}
+
 void * mallocRec(uint64_t size, unsigned int node, uint64_t current_size, void * address){
     void * resp = NULL;
  
@@ -147,13 +151,13 @@ typedef struct{
 }block;
 
 block bitmap[BITMAP_SIZE]; 
-uint64_t usedMem = 0;
+uint64_t memory_used = 0;
 
 
 void * malloc(uint64_t n){
    
     void *result = NULL;
-    if(MEM_SIZE - usedMem < n){
+    if(MEM_SIZE - memory_used < n){
         return result;
     }
     int blocksNeeded = n/BLOCK_SIZE + 1; 
@@ -179,7 +183,7 @@ void * malloc(uint64_t n){
         bitmap[i+j].blocks = blocksNeeded;
     }
     result = (void *) (START_MM + (i * BLOCK_SIZE));
-    usedMem += n;
+    memory_used += n;
 
     return result;
 }
@@ -191,4 +195,10 @@ void free( void * add){
         bitmap[pos + i].occupied = 0;
     } 
 }
+
+uint64_t usedMem(){
+    return memory_used;
+}
+
+
 #endif

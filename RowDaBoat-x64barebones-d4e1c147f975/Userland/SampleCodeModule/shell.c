@@ -1,7 +1,7 @@
 #include <lib.h>
 #include <stdint.h>
 #include <shell.h>  
-#define CANT_FUNC 13
+#define CANT_FUNC 15
 
 char fun[CANT_FUNC][40] = {
     "get time",
@@ -13,6 +13,8 @@ char fun[CANT_FUNC][40] = {
     "help", 
     "ps", 
     "loop",
+    "mem",
+    "sem",
     "nice", 
     "kill", 
     "block",
@@ -28,6 +30,8 @@ char descFun[CANT_FUNC][100] = {
     ": Imprime las funciones disponibles y su descripcion",  
     ": Imprime una lista de todos los procesos con su pid, su estado y el BP",
     ": Crea un proceso loop que imprime su pid despues de una cantidad de segundo",
+    ": Iprime el estado de la memoria",
+    ": Imprime una lista con todos los semaforos activos, su estado, y los procesos bloqueados",
     ":Recibe como parametro el ID de un proceso y una nueva prioridad y le asgina a ese procesos esa prioridad",
     ": Recibe como parametro el ID de un proceso, y lo mata",
     ": Recibe como parametro el ID de un proceso, y lo bloquea",
@@ -45,6 +49,16 @@ static void help(){
         newLine();
         newLine();
     }
+}
+
+static void print_Mem(){
+    uint64_t memUsed = mem();
+
+    print("Memoria ocupada: ");
+    char num[20];
+    numToChar(memUsed, num);
+    print(num);
+    newLine();
 }
 
 static void printTime(){
@@ -326,13 +340,41 @@ static void loop(){
     
 }
 
+uint64_t cont = 0;
+void sem_test(){
+    uint64_t j;
+    sem_open("test", 1);
+    for(uint64_t i =0;i<1000;i++){
+        
+       
+        sem_wait("test");
+        j=0;
+        while(j<999999){
+            j++;
+        }
+        cont++;
+        sem_post("test");
+        j = 0;
+        while(j<999999){
+            j++;
+        }
+
+    }
+    sem_close("test");
+    char num[20];
+    numToChar(cont, num);
+    print(num);
+    newLine();
+}
+
 static void createLoopProces(){
     print("Creando proceso");
     newLine();
     char ** argv = malloc(16);
     argv[0] = "loop";
-    int pid = create_process((uint64_t)&loop, 1, argv, 1);
+    int pid = create_process((uint64_t)&sem_test, 1, argv, 1);
 }
+
 
 
 
@@ -410,6 +452,14 @@ static int startFunction(char * c){
     }
     if(i==8){
         createLoopProces();
+        return 1;
+    }
+    if(i==9){
+        print_Mem();
+        return 1;
+    }
+    if(i==10){
+        print_sem();
         return 1;
     }
   

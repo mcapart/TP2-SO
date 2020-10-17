@@ -4,6 +4,7 @@
 #include <lib.h>
 #include <memory_manager.h>
 #include <scheduler.h>
+#include <sem.h>
 
 
 extern uint8_t getHou();
@@ -72,6 +73,13 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
         case 21: sys_sleep(rdi);
                 break;   
         case 22: return changePriority(rdi, rsi); 
+        case 23: return usedMem();
+        case 24: return sem_open(rdi, rsi);
+        case 25: return sem_close(rdi);
+        case 26: return sem_wait(rdi);
+        case 27: return sem_post(rdi);
+        case 28: print_sem();
+                break;
     }
     return 0;
 }

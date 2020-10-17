@@ -67,4 +67,16 @@ void _sti();
 
 int changePriority(uint64_t pid, uint8_t newPriority);
 
+uint64_t mem();
+
+void sem_open(char * name, uint64_t value);
+
+int sem_close(char * name);
+
+int sem_wait(char * name);
+
+int sem_post(char * name);
+
+void print_sem();
+
 #endif

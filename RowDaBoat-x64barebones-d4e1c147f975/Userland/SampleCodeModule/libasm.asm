@@ -24,6 +24,13 @@ GLOBAL currentPid
 GLOBAL sleep
 GLOBAL _sti
 GLOBAL changePriority
+GLOBAL mem
+GLOBAL sem_open
+GLOBAL sem_close
+GLOBAL sem_wait
+GLOBAL sem_post
+GLOBAL print_sem
+
 
 section .text
 
@@ -289,6 +296,77 @@ changePriority:
     mov rbp, rsp
     
     mov rax, 22
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;uint64_t mem();
+mem:
+     push rbp
+    mov rbp, rsp
+    
+    mov rax, 23
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+
+;void sem_open(char * name, uint64_t value);
+sem_open:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 24
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;int sem_close(char * name);
+sem_close:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 25
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;int sem_wait(char * name);
+sem_wait:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 26
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;int sem_post(char * name);
+sem_post:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 27
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+print_sem:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 28
     int 80h
 
     mov rsp, rbp

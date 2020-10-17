@@ -99,5 +99,28 @@ void numToChar(double num, char * c){
     c[i] = 0;
 }
 
-
+int strComp(char * c1, char * c2){
+    int i = 0;
+    int j = 0;
+    while(c1[j] == ' ' && c1[j] != 0){
+            j++;
+    }
+    for(; c1[j] != 0 && c2[i] != 0; i++, j++){
+        if(c1[j] != c2[i]){
+            return c1[j] - c2[i];
+        }
+    }
+    while(c1[j] == ' ' && c1[j] != 0){
+        j++;
+    }
+    if (c1[j])
+    {
+        return 1;
+    }
+    if (c2[i])
+    {
+        return -1;
+    }
+    return 0;
+}
 

@@ -10,6 +10,8 @@
 
 void * malloc(uint64_t n);
 void free(void * add);
+uint64_t usedMem();
+
 
 
 
