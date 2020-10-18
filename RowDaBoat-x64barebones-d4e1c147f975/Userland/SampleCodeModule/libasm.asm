@@ -1,5 +1,5 @@
-GLOBAL print 
-GLOBAL getChar 
+GLOBAL read
+GLOBAL write
 GLOBAL changeApp
 GLOBAL start
 GLOBAL deleteChar
@@ -30,7 +30,8 @@ GLOBAL sem_close
 GLOBAL sem_wait
 GLOBAL sem_post
 GLOBAL print_sem
-
+GLOBAL pipe
+GLOBAL close_pipe
 
 section .text
 
@@ -38,27 +39,24 @@ _sti:
     sti 
     ret
 
-; void print(char *)
-print:
+; int write(int fd, char * s, int length)
+write:
     push rbp
     mov rbp, rsp
 
     mov rax, 2
-    mov rsi, rdi
     int 80h
     
     mov rsp, rbp
     pop rbp
     ret
            
-;void getChar(char *);
-getChar:
+;int read(int fd, char * s, int length)
+read:
     push rbp
     mov rbp, rsp
 
-    mov rax, 1
-    mov rsi, rdi 
-    mov rdx, 1   
+    mov rax, 1   
     int 80h
 
     mov rsp, rbp
@@ -373,6 +371,53 @@ print_sem:
     pop rbp
     ret
 
+;int pipe(int fd)
+pipe:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 29
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;int close_pipe(int fd)
+close_pipe:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 30
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+;void  print_pipes()   
+print_pies:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 31
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret   
+
+;void dup2(int fd1, int fd2);
+dup2:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 32
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret    
 tryInvalidOpcode:
     push rbp
     mov rbp, rsp

@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <shell.h>  
 #define CANT_FUNC 15
+#define FOREGROUND 1
+#define BACKGROUND 0
 
 char fun[CANT_FUNC][40] = {
     "get time",
@@ -325,10 +327,11 @@ static void loop(){
     uint64_t j;
     while (i<15)
     {
-        j=0;
+       /* j=0;
         while(j<99999999){
             j++;
-        }
+        }*/
+        sleep(3);
         newLine();
         print("Hola! :) este es mi PID: ");
         numToChar(pid, num);
@@ -343,20 +346,15 @@ uint64_t cont = 0;
 void sem_test(){
     uint64_t j;
     sem_open("test", 1);
-    for(uint64_t i =0;i<1000;i++){
+    for(uint64_t i =0;i<10;i++){
         
        
         sem_wait("test");
-        j=0;
-        while(j<999999){
-            j++;
-        }
+       sleep(2);
         cont++;
         sem_post("test");
         j = 0;
-        while(j<999999){
-            j++;
-        }
+        sleep(2);
     }
     sem_close("test");
     char num[20];
@@ -370,7 +368,7 @@ static void createLoopProces(){
     newLine();
     char ** argv = malloc(16);
     argv[0] = "loop";
-    int pid = create_process((uint64_t)&sem_test, 1, argv, 1);
+    int pid = create_process((uint64_t)&sem_test, 1, argv, 1, BACKGROUND);
 }
 
 

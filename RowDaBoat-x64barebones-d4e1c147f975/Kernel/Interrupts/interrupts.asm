@@ -143,8 +143,8 @@ picSlaveMask:
 int_80h:
 	push rbp
 	mov rbp, rsp
-	push r8
-	mov r8, rax
+	push r9
+	mov r9, rax
 	call systemCall
 	pop r8
 	mov rsp, rbp
@@ -239,6 +239,7 @@ getErrorRIP:
 
 timer_interruption:
 	int 20h
+	ret
 
 SECTION .bss
 	aux resq 1

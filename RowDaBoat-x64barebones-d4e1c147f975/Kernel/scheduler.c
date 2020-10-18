@@ -32,7 +32,7 @@ void schedulerInitializer(){
     char ** argv = malloc(16);
     argv[0] = "sampleCOdeModule";
 
-    shell_pid = create_proces(0x400000, 1, argv, 5);
+    shell_pid = create_proces(0x400000, 1, argv, 5, 1);
     if(shell_pid == -1){
          writeWord("Error while creating process.", 1.5, errorColor);
          return;
@@ -113,11 +113,16 @@ uint64_t scheduler(uint64_t sp){
    }*/
 
    uint64_t rsp = process_list[iterator].process->sp;
+   
     return rsp;
 }
 
 uint64_t currentPid(){
     return process_list[iterator].process->pid;
+}
+
+processStruct  * currentProcess(){
+    return process_list[iterator].process;
 }
 
 int process_is_available(processState p){
@@ -253,6 +258,11 @@ void print_processes(){
             writeWord("State: ", 1.5, color);
             writeWord(state_to_string(process_list[i].state), 1.5, color);
             newLine();
+
+            char * fg = (process_list[i].process->fg == 1)? "Foreground":"Background";
+            writeWord(fg, 1.5, color);
+            newLine();
+
             writeWord("Process BP: ", 1.5, color);
             char num2[30] = {0};
             numToChar(process_list[i].process->bp, num2);

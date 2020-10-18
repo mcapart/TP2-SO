@@ -3,6 +3,7 @@
 #include <memory_manager.h>
 #include <stddef.h>
 #include <video_driver.h>
+#include <scheduler.h>
 
 
 
@@ -26,7 +27,7 @@ void process_wrapper(int codeEntry(uint64_t argc, char ** argv), uint64_t argc, 
     kill(program_pid);
 }
 
-int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority){
+int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority, uint8_t fg){
     processStruct * process = (processStruct *) malloc(sizeof(processStruct));
     if(process == NULL){
         writeWord("Error while creating process.", 1.5, errorColor);
@@ -44,6 +45,24 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority){
     process->priority = priority;
 
     process->pid = pid;
+    if(pid != 0){
+        process->ppid = currentPid();
+        processStruct * father = currentProcess(); 
+        for(int i = 0; i < MAX_FD_PROCESS; i++){
+            process->fd_array[i][0] = father->fd_array[i];
+            process->fd_array[i][1] = father->fd_array[i];
+        }
+    }else{
+        process->ppid = -1;
+        for(int i=0;i<MAX_FD_PROCESS;i++){
+            process->fd_array[i][0] = -1;
+            process->fd_array[i][1] = -1;
+        }
+        add_fd_process(STDIN, process);
+        add_fd_process(STDOUT, process);
+        add_fd_process(STDERR, process);
+
+    }
     process->MemPointer = (uint64_t) malloc(PROCESS_STACK_SIZE);
     if(process->MemPointer == 0){
         writeWord("Error while creating process.", 1.5, errorColor);
@@ -56,6 +75,9 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority){
     process->bp = StartStack; 
     process->ip = codeEntry;
     process->argv = argv;
+    process->fg = fg;
+
+    
 
     
     
@@ -84,4 +106,61 @@ uint64_t killProcess(processStruct * process){
     free((void *)process->MemPointer);
     free(process);
     return 0;
+}
+
+int add_fd_process(int fd, processStruct * p){
+    if(p == NULL){
+        return -1;
+    }
+    for(int i=0;i<MAX_FD_PROCESS;i++){
+        if(p->fd_array[i][0] == -1){
+            p->fd_array[i][0] = fd;
+            p->fd_array[i][1] = fd;
+            return 0;
+        }
+    }
+    return -1;
+}
+
+void dup2(int fd1, int fd2){
+    processStruct * p = currentProcess();
+    if(p == NULL){
+        return -1;
+    }
+     for(int i=0;i<MAX_FD_PROCESS;i++){
+        if(p->fd_array[i][0] == fd2){
+            p->fd_array[i][1] = fd1;
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int getRealFD(int fd){
+      processStruct * p = currentProcess();
+    if(p == NULL){
+        return -1;
+    }
+     for(int i=0;i<MAX_FD_PROCESS;i++){
+        if(p->fd_array[i][0] == fd){
+           return p->fd_array[i][1];
+            
+        }
+    }
+    return -1;
+}
+
+int remove_fd_process(int fd){
+    processStruct * p = currentProcess();
+    if(p == NULL){
+        return -1;
+    }
+     for(int i=0;i<MAX_FD_PROCESS;i++){
+        if(p->fd_array[i][0] == fd){
+            p->fd_array[i][0] = -1;
+            
+        }
+    }
+    return 0;
+
 }

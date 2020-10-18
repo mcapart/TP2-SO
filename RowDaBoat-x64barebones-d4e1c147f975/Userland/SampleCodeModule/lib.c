@@ -1,6 +1,7 @@
 #include <lib.h>
-#include <calculator.h>
+
 #include <shell.h>
+#include <stddef.h>
 
 static int app;
 
@@ -52,12 +53,9 @@ void numToChar(double num, char * c){
 }
 
 void initApp(int app){
-    if(app == 0){
-        reStartCalculator();
-    }
-    else{
+    
         reStartShell();
-    }
+    
 }
 
 int getApp(){
@@ -125,4 +123,23 @@ void deleteAll(int n){
         deleteChar();
         n--;
     }
+}
+
+void getChar(char* c){
+    read(0, c, 1);
+}
+
+int strLen(char * s){
+    if(s == NULL){
+        return 0;
+    }
+    int i = 0;
+    while(s[i] != 0){
+        i++;
+    }
+    return i;
+}
+
+void print(char * s){
+    write(1, s, strLen(s));
 }

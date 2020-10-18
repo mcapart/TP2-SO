@@ -18,6 +18,8 @@ typedef struct {
 
 int make_available(int pid);
 
+processStruct  * currentProcess();
+
 void schedulerInitializer();
 
 uint8_t addToList(processStruct * process);

@@ -1,6 +1,6 @@
 /* sampleCodeModule.c */
 #include <lib.h>
-#include <calculator.h>
+
 #include <shell.h>
 #include <lib.h>
 

@@ -5,6 +5,7 @@
 #include <memory_manager.h>
 #include <scheduler.h>
 #include <sem.h>
+#include <pipes.h>
 
 
 extern uint8_t getHou();
@@ -13,11 +14,6 @@ extern uint8_t getSec();
 extern void setRegCalc(uint64_t rip, uint64_t rbp);
 extern void setRegShell(uint64_t rip, uint64_t rbp);
 extern void setApp(int i);
-
-
-
-void sys_read(uint64_t rdi, char * rsi, uint64_t rdx);//rax = 1 => syscall read 
-void sys_write(uint64_t rdi, char * rsi, uint64_t rdx);//rax = 2 => syscall wirte
 
 void sys_delete(); //rax = 5 => syscall delete
 void sys_newLine(); //rax = 6 => syscall newLine
@@ -33,12 +29,11 @@ void sys_saveReturn(uint64_t rip, uint64_t rbp, int app);
 void sys_sleep(uint64_t rdi);
 
 
-uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uint64_t rax){
+uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uint64_t r8, uint64_t rax){
     switch(rax){
-        case 1: sys_read(rdi, (char *) rsi, rdx);
+        case 1: return read_fd(rdi, rsi, rdx);
                 break;
-        case 2: sys_write(rdi,(char *) rsi, rdx);
-                break;
+        case 2:  return write_fd(rdi,rsi, rdx);
         case 3: return malloc(rdi);
         case 4: free(rdi);
                 break;      
@@ -64,7 +59,7 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;
         case 15: sys_saveReturn(rdi, rsi, rdx);
                 break;
-        case 16: return create_proces(rdi, rsi, rdx,rcx);
+        case 16: return create_proces(rdi, rsi, rdx,rcx, rax);
         case 17: return kill(rdi);
         case 18: print_processes();
                 break;
@@ -80,20 +75,20 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
         case 27: return sem_post(rdi);
         case 28: print_sem();
                 break;
+        case 29: return pipe(rdi);
+        case 30: return closeFD(rdi);
+        case 31: print_pipes();
+                break;
+        case 32: dup2(rdi, rsi);
+                break;
+        
     }
     return 0;
 }
 
 
-void sys_read(uint64_t rdi, char * rsi, uint64_t rdx){
-    getNChar(rsi, rdx);
 
-}
-void sys_write(uint64_t rdi, char * rsi, uint64_t rdx){
-    int color[3] = {255, 255, 255};
-    writeWord(rsi, 1.5, color);
 
-}
 
 void sys_delete(){
     deleteChar();

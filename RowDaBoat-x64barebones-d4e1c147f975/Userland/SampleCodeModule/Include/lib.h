@@ -52,7 +52,7 @@ void * malloc(uint64_t size);
 
 void free(void * add);
 
-uint64_t create_process(uint64_t codeEntry, uint64_t argc, uint64_t argv, uint8_t priority);
+uint64_t create_process(uint64_t codeEntry, uint64_t argc, uint64_t argv, uint8_t priority, uint8_t fg);
 
 uint64_t kill(uint64_t pid);
 
@@ -79,4 +79,16 @@ int sem_post(char * name);
 
 void print_sem();
 
+int read(int fd, char * s, int length);
+
+int write(int fd, char * s, int length);
+
+int pipe(int fd);
+
+int close_pipe(int fd);
+
+void  print_pipes();
+            
+void dup2(int fd1, int fd2);
+  
 #endif

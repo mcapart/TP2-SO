@@ -7,6 +7,7 @@
 #include "video_driver.h"
 #include <scheduler.h>
 #include <interrupts.h>
+#include <pipes.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -56,7 +57,7 @@ int main()
 
 	
 
-
+	fd_init();
 	schedulerInitializer();
 	
 	_hlt();

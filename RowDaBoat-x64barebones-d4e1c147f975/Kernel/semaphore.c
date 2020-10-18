@@ -14,8 +14,7 @@ sem_struct * sem_list[MAX_SEM] = {NULL};
 int errorColor[3] = {0, 0, 255};
 
 sem_struct * sem_open(char * name, int value){
-    writeWord("in open", 1.5, errorColor);
-    newLine();
+  
     if(name == NULL){
         writeWord("You must provide a name", 1.5, errorColor);
         return NULL;
@@ -35,20 +34,17 @@ sem_struct * sem_open(char * name, int value){
         newSem->cant_process =1;
         newSem->first_blocked_process = NULL;
         sem_list[index] = newSem;
-          writeWord("open", 1.5, errorColor);
-          newLine();
+         
         return sem_list[index];
     }else{
-        writeWord("existing", 1.5, errorColor);
-        newLine();
+        
         sem_list[index]->cant_process++;
         return sem_list[index];
     }
 }
 
 int sem_close(char * name){
-    writeWord("in close", 1.5, errorColor);
-    newLine(); 
+  
     int index = check_name(name);
   
     if(index == -1){
@@ -86,12 +82,11 @@ int sem_post(char * name){
         sem_list[index]->value++;
     }
     else{
-        writeWord("entre aca", 1.5, errorColor);
+        
         block_queue * blocked_process = sem_list[index]->first_blocked_process;
         if(find_process(blocked_process->pid) != -1){
             make_available(blocked_process->pid);
-            writeWord("desbloqueado" , 1.5, errorColor);
-            newLine();
+            
             
     
             //tendria que estar bloqueado entonces cambia a available
