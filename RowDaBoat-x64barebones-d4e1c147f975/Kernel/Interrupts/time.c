@@ -8,6 +8,7 @@ void timer_handler() {
 	ticks++;
 	//writeWord("timer", 1.5, color);
 	//newLine();
+	return;
 }
 
 int ticks_elapsed() {

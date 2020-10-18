@@ -67,6 +67,8 @@ int sem_close(char * name){
     return 0;
 }
 
+
+
 int sem_post(char * name){
     int index = check_name(name);
     if(index == -1){
@@ -74,7 +76,7 @@ int sem_post(char * name){
     }
     
     acquire(&(sem_list[index]->lock));
-    if(sem_list[index]->value > 0 || sem_list[index]->first_blocked_process ==NULL){
+    if(sem_list[index]->first_blocked_process == NULL){
         if(sem_list[index]->value > 1){
             char num[10];
              numToChar(sem_list[index]->value, num);
@@ -90,7 +92,7 @@ int sem_post(char * name){
             make_available(blocked_process->pid);
             writeWord("desbloqueado" , 1.5, errorColor);
             newLine();
-          
+            
     
             //tendria que estar bloqueado entonces cambia a available
         }
@@ -119,7 +121,7 @@ int sem_wait(char * name){
     acquire(&(sem_list[index]->lock));
   
     
-    if(sem_list[index]->value == 0){
+    if(sem_list[index]->value < 1){
         int pid = currentPid();
         
         block_queue * blocked_process = (block_queue *) malloc(sizeof(block_queue));

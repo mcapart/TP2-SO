@@ -339,7 +339,6 @@ static void loop(){
     }
     
 }
-
 uint64_t cont = 0;
 void sem_test(){
     uint64_t j;
@@ -358,7 +357,6 @@ void sem_test(){
         while(j<999999){
             j++;
         }
-
     }
     sem_close("test");
     char num[20];

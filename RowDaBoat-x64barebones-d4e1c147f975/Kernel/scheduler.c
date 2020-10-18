@@ -111,7 +111,9 @@ uint64_t scheduler(uint64_t sp){
    else{
        writeChar('1',1.5,errorColor);
    }*/
-    return process_list[iterator].process->sp;
+
+   uint64_t rsp = process_list[iterator].process->sp;
+    return rsp;
 }
 
 uint64_t currentPid(){
@@ -183,6 +185,7 @@ int changePriority(uint64_t pid, uint8_t newPriority ){
     return 0;
 
 }
+int hola(){};
 
 int blockProcess(uint64_t pid){
     int process = find_process(pid);
@@ -192,8 +195,10 @@ int blockProcess(uint64_t pid){
     }
 
     process_list[process].state = BLOCKED;
-    if(process_list[iterator].process->pid == pid)
+    if(process_list[iterator].process->pid == pid){
+        hola();
         timer_interruption();
+    }
     return 0;
 }
 
