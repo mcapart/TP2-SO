@@ -24,6 +24,8 @@ void numToChar(double v, char * text);
 
 int strComp(char * c1, char * c2);
 
+int strLen(char * s);
+
 
 
 #endif

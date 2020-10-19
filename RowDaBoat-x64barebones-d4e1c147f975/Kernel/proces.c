@@ -49,8 +49,8 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority, 
         process->ppid = currentPid();
         processStruct * father = currentProcess(); 
         for(int i = 0; i < MAX_FD_PROCESS; i++){
-            process->fd_array[i][0] = father->fd_array[i];
-            process->fd_array[i][1] = father->fd_array[i];
+            process->fd_array[i][0] = father->fd_array[i][0];
+            process->fd_array[i][1] = father->fd_array[i][1];
         }
     }else{
         process->ppid = -1;

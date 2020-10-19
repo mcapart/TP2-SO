@@ -163,7 +163,7 @@ int kill(uint64_t pid){
     int processIndex = find_process(pid);
     if(processIndex == -1){
          writeWord("The process does not exist", 1.5, errorColor);
-         return 2;
+         return 1;
     }
     process_list[processIndex].state = EMPTY;
     cant_process--;
@@ -282,8 +282,6 @@ void print_processes(){
 
 char * state_to_string(uint8_t state){
     switch (state){
-        case HALT:
-            return "HALT";
         case AVAILABLE:
             return "AVAILABLE";
         case BLOCKED:
@@ -316,10 +314,16 @@ int make_available(int pid){
     int processIndex = find_process(pid);
     if(processIndex == -1){
         writeWord("Error. The PID given is unknown\n", 1.5, errorColor);
-        return 1;
+        return -1;
     } 
     else{
        process_list[processIndex].state = AVAILABLE;
        return 0;
     }
+}
+
+void giveCpu(){
+    process_list[iterator].quantum_left = 0;
+    timer_interruption();
+    return;
 }

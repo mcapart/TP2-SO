@@ -1,7 +1,8 @@
 #include <lib.h>
 #include <stdint.h>
 #include <shell.h>  
-#define CANT_FUNC 15
+#include <test_util.h>
+#define CANT_FUNC 21
 #define FOREGROUND 1
 #define BACKGROUND 0
 
@@ -17,12 +18,18 @@ char fun[CANT_FUNC][40] = {
     "loop",
     "mem",
     "sem",
+    "pipe",
+    "test mem",
+    "test process",
+    "test prio",
+    "test sync",
+    "test no sync",
     "nice", 
     "kill", 
     "block",
     "printMem" 
     };
-char descFun[CANT_FUNC][100] = {
+char descFun[CANT_FUNC][150] = {
     ": Imprime la hora actual del sistema", 
     ": Imprime informacion del cpu", 
     ": Imprime la temperatura del cpu", 
@@ -34,7 +41,13 @@ char descFun[CANT_FUNC][100] = {
     ": Crea un proceso loop que imprime su pid despues de una cantidad de segundo",
     ": Iprime el estado de la memoria",
     ": Imprime una lista con todos los semaforos activos, su estado, y los procesos bloqueados",
-    ":Recibe como parametro el ID de un proceso y una nueva prioridad y le asgina a ese procesos esa prioridad",
+    ": Imprime una lista con todos los pipes activos, y los procesos blockeados",
+    ": Hace un testeo de la memoria",
+    ": Hace un testeo de creacion, bloqueo, desbloqueo y muerte de los procesos",
+    ": Hace un test de los cambios de prioridad",
+    ": Hace un test de semaforos",
+    ": Test que muestra que pasa si no usas semafors",
+    ": Recibe como parametro el ID de un proceso y una nueva prioridad y le asgina a ese procesos esa prioridad",
     ": Recibe como parametro el ID de un proceso, y lo mata",
     ": Recibe como parametro el ID de un proceso, y lo bloquea",
     ": Volcado de memoria desde la posicion pasada como argumento" 
@@ -363,12 +376,49 @@ void sem_test(){
     newLine();
 }
 
+
+write_pipe(char * str, int fd){
+    while(*str){
+        write(fd, str++, 1);
+    }
+    write(fd, str, 1);
+}
+
+void child(){
+    int fd = pipe("test");
+    char buffer[12] = {0};
+    char * buff = buffer;
+    for(int i=0;i<12;i++){
+        read(fd, buff++, 1);
+    }
+
+    if(strComp(buffer, "testeo pipe")){
+        print("ERROR");
+    }
+    print(buffer);
+    newLine();
+    sleep(5);
+    close_pipe(fd);
+    return;
+}
+
+void pipe_test(){
+     char ** argv = malloc(16);
+    argv[0] = "child";
+    int fd = pipe("test");
+    int pid = create_process((uint64_t)&child, 1, argv, 1, BACKGROUND);
+    write_pipe("testeo pipe", fd);
+    sleep(5);
+    close_pipe(fd);
+    return;
+}
+
 static void createLoopProces(){
     print("Creando proceso");
     newLine();
     char ** argv = malloc(16);
     argv[0] = "loop";
-    int pid = create_process((uint64_t)&sem_test, 1, argv, 1, BACKGROUND);
+    int pid = create_process((uint64_t)&loop, 1, argv, 1, BACKGROUND);
 }
 
 
@@ -458,7 +508,40 @@ static int startFunction(char * c){
         print_sem();
         return 1;
     }
-  
+    if(i==11){
+        print_pipes();
+        return 1;
+    }
+    if(i==12){
+         char ** argv = malloc(16);
+         argv[0] = "test mm";
+         int pid = create_process((uint64_t)&test_mm, 1, argv, 1, BACKGROUND);
+         return 1;
+    }
+     if(i==13){
+         char ** argv = malloc(16);
+         argv[0] = "test process";
+         int pid = create_process((uint64_t)&test_processes, 1, argv, 1, BACKGROUND);
+         return 1;
+    }
+    if(i==14){
+         char ** argv = malloc(16);
+         argv[0] = "test prio";
+         int pid = create_process((uint64_t)&test_prio, 1, argv, 2, BACKGROUND);
+         return 1;
+    }
+    if(i==15){
+        char ** argv = malloc(16);
+         argv[0] = "test sync";
+         int pid = create_process((uint64_t)&test_sync, 1, argv, 2, BACKGROUND);
+         return 1;
+    }
+    if(i==16){
+        char ** argv = malloc(16);
+         argv[0] = "test no sync";
+         int pid = create_process((uint64_t)&test_no_sync, 1, argv, 2, BACKGROUND);
+         return 1;
+    }
     
 
     return 0;

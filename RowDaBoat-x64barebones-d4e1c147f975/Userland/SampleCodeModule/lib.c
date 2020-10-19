@@ -18,6 +18,8 @@ static void reverse(char * c, int l){
     } 
 }
 
+
+
 void numToChar(double num, char * c){
     int entera = num;
     double decimal = num - entera;

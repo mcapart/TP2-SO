@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 
 
@@ -124,3 +125,13 @@ int strComp(char * c1, char * c2){
     return 0;
 }
 
+int strLen(char * s){
+    if(s == NULL){
+        return 0;
+    }
+    int i = 0;
+    while(s[i] != 0){
+        i++;
+    }
+    return i;
+}

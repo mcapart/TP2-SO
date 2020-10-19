@@ -28,7 +28,7 @@ sem_struct * sem_open(char * name, int value){
             return NULL; 
         }
         sem_struct * newSem = (sem_struct *) malloc(sizeof(sem_struct));
-        memcpy(newSem->name, name, MAX_NAME);
+        memcpy(newSem->name, name, strLen(name));
         newSem->value = value;
         newSem->lock = 0;
         newSem->cant_process =1;
@@ -73,12 +73,7 @@ int sem_post(char * name){
     
     acquire(&(sem_list[index]->lock));
     if(sem_list[index]->first_blocked_process == NULL){
-        if(sem_list[index]->value > 1){
-            char num[10];
-             numToChar(sem_list[index]->value, num);
-             writeWord(num, 1.5, errorColor);
-            newLine();
-        }
+       
         sem_list[index]->value++;
     }
     else{
@@ -206,9 +201,10 @@ void print_sem(){
             
             block_queue * temp = sem_list[i]->first_blocked_process;
             writeWord("Proces blocked: ", 1.5, color);
-            newLine();
             if(temp == NULL){
                 writeWord("0 proces blocked", 1.5, color);
+                newLine();
+            }else{
                 newLine();
             }
             while (temp != NULL)
@@ -220,6 +216,7 @@ void print_sem(){
                 newLine();
                 temp = temp->next;
             }
+            newLine();
             
 
         }

@@ -32,6 +32,11 @@ GLOBAL sem_post
 GLOBAL print_sem
 GLOBAL pipe
 GLOBAL close_pipe
+GLOBAL print_pipes
+GLOBAL dup2
+GLOBAL giveCPU
+GLOBAL block
+GLOBAL unblock
 
 section .text
 
@@ -396,7 +401,7 @@ close_pipe:
     ret
 
 ;void  print_pipes()   
-print_pies:
+print_pipes:
  push rbp
     mov rbp, rsp
     
@@ -413,6 +418,39 @@ dup2:
     mov rbp, rsp
     
     mov rax, 32
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret  
+;void giveCpu();
+giveCPU:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 33
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret   
+
+block:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 34
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret   
+
+unblock:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 35
     int 80h
 
     mov rsp, rbp

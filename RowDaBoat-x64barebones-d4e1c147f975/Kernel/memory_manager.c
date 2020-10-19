@@ -183,7 +183,7 @@ void * malloc(uint64_t n){
         bitmap[i+j].blocks = blocksNeeded;
     }
     result = (void *) (START_MM + (i * BLOCK_SIZE));
-    memory_used += n;
+    memory_used += BLOCK_SIZE * blocksNeeded;
 
     return result;
 }
@@ -193,6 +193,7 @@ void free( void * add){
     int blocksNeeded = bitmap[pos].blocks;
     for(int i =0;i<blocksNeeded;i++){
         bitmap[pos + i].occupied = 0;
+        memory_used-=BLOCK_SIZE;
     } 
 }
 

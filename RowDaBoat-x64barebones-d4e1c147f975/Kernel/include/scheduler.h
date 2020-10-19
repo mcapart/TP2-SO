@@ -8,7 +8,7 @@
 #include <stddef.h>
 
 
-enum process_state {HALT, AVAILABLE, BLOCKED, EMPTY, SLEEP};
+enum process_state {AVAILABLE, BLOCKED, EMPTY};
 
 typedef struct {
     processStruct * process;
@@ -49,5 +49,7 @@ uint64_t currentPid();
 int sleepProcess(uint64_t sec);
 
 int changePriority(uint64_t pid, uint8_t newPriority );
+
+void giveCpu();
 
 #endif

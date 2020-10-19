@@ -69,7 +69,7 @@ int changePriority(uint64_t pid, uint8_t newPriority);
 
 uint64_t mem();
 
-void sem_open(char * name, uint64_t value);
+int sem_open(char * name, uint64_t value);
 
 int sem_close(char * name);
 
@@ -83,12 +83,20 @@ int read(int fd, char * s, int length);
 
 int write(int fd, char * s, int length);
 
-int pipe(int fd);
+int pipe(char * name);
 
 int close_pipe(int fd);
 
 void  print_pipes();
             
 void dup2(int fd1, int fd2);
+
+void giveCPU();
+
+int block(uint64_t pid);
+
+int unblock(uint64_t pid);
+
+
   
 #endif

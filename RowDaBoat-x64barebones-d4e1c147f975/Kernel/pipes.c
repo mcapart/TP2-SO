@@ -8,13 +8,6 @@ int find_fd(char * name);
 
 int find_fd_place();
 
-void fd_init(){
-    if(addFD("STDIN", 0) == NULL || addFD("STDOUT", 0) == NULL || addFD("STDERR", 0) == NULL){
-        writeWord("Error adding stdin, stdout and/or stderr to fd", 1.5, errorColor);
-        return;
-    }
-}
-
 
 fd_struct * addFD(char * name, int isPipe){
      if(name == NULL){
@@ -24,25 +17,42 @@ fd_struct * addFD(char * name, int isPipe){
     if (index == -1)
         writeWord("There is no more space for fd", 1.5, errorColor);
     
-    fd_struct * newFD = (fd_struct *) malloc(sizeof(fd_struct));
+    fd_struct * newFD = (fd_struct *) malloc(sizeof( fd_struct));
+    char nameR[MAX_LENGTH_NAME_FD] = {0};
+    char nameW[MAX_LENGTH_NAME_FD] = {0};
+    nameR[0] = 'R';
+    nameW[0] = 'W';
+    memcpy(&(nameR[1]), name, strLen(name));
+    memcpy(&(nameW[1]), name, strLen(name));
+    newFD->sem_r = sem_open(nameR, 0);
+    newFD->sem_w = sem_open(nameW, MAX_LENGTH_BUFFER_FD);
+    newFD->process_counter = 1;
     memcpy(newFD->name, name, MAX_LENGTH_NAME_FD);
     newFD->isPipe = isPipe;
     newFD->fd = index;
     newFD->index_w = 0;
     newFD->index_r = 0;
-    char nameR[MAX_LENGTH_NAME_FD];
-    char nameW[MAX_LENGTH_NAME_FD];
-    nameR[0] = 'R';
-    nameW[0] = 'W';
-    memcpy(&(nameR[1]), name, MAX_LENGTH_NAME_FD);
-    memcpy(&(nameW[1]), name, MAX_LENGTH_NAME_FD);
-    newFD->sem_r = sem_open(nameR, 0);
-    newFD->sem_w = sem_open(nameW, MAX_LENGTH_BUFFER_FD);
-    newFD->process_counter = 1;
     fd_list[index] = newFD;
+    
     return fd_list[index];
 
 }
+
+
+void fd_init(){
+
+    fd_struct * fd = addFD("STDIN", 0);
+    fd_struct * fd2 = addFD("STDOUT", 0);
+    fd_struct * fd3 = addFD("STDERR", 0);
+    if(fd == NULL || fd2 == NULL || fd3 == NULL){
+        writeWord("Erors while initializing pipes", 1.5, errorColor);
+        newLine();
+        return;
+    }
+  
+}
+
+
 
 int pipe(char * name){
      if(name == NULL){
@@ -50,7 +60,8 @@ int pipe(char * name){
     }
     int index = find_fd(name);
     if (index == -1){
-        fd_struct * newFD = addFD(name, 1);
+        fd_struct * newFD;
+        newFD = addFD(name, 1);
         if(newFD == NULL){
             return -1;
         }
@@ -58,10 +69,18 @@ int pipe(char * name){
         if(err == -1){
             return -1;
         }
-        return newFD->fd;
+        int fd = newFD->fd;
+        return fd;
     }
-    fd_list[index]->process_counter++;
-    return index;
+    else{
+        int err = add_fd_process(index, currentProcess());
+        if(err == -1){
+            return -1;
+        }
+           fd_list[index]->process_counter++;
+        return index;
+    }
+ 
 }
 
 int closeFD(int fd){
@@ -147,9 +166,14 @@ void print_pipes(){
             writeWord(num, 1.5, color);
             newLine();
             writeWord("Blocked by sem_read: ", 1.5, color);
-            newLine();
             block_queue * temp = fd_list[i]->sem_r->first_blocked_process;
             int j = 1;
+            if(temp == NULL){
+                writeWord("0 proces blocked", 1.5, color);
+                newLine();
+            }else{
+                newLine();
+            }
             while(temp != NULL){
                 writeWord("     PID: ", 1.5, color);
                 char num2[20];
@@ -160,8 +184,13 @@ void print_pipes(){
                 j++;
             }
             writeWord("Blocked by sem_write: ", 1.5, color);
-            newLine();
             temp = fd_list[i]->sem_w->first_blocked_process;
+            if(temp == NULL){
+                writeWord("0 proces blocked", 1.5, color);
+                newLine();
+            }else{
+                newLine();
+            }
             while(temp != NULL){
                 writeWord("     PID: ", 1.5, color);
                 char num3[20];
@@ -217,7 +246,7 @@ int read_fd(int fd,  char * str, int length){
               
                 sem_post(fd_list[realFD]->sem_w->name);
             }
-            fd_list[realFD]->index_r - index_buff % MAX_LENGTH_BUFFER_FD;
+            fd_list[realFD]->index_r = index_buff % MAX_LENGTH_BUFFER_FD;
             return j;
     }
     

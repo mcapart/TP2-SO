@@ -81,7 +81,10 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;
         case 32: dup2(rdi, rsi);
                 break;
-        
+        case 33: giveCpu();
+                break;
+        case 34: return blockProcess(rdi);
+        case 35: return make_available(rdi);
     }
     return 0;
 }
