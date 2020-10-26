@@ -39,7 +39,7 @@ void schedulerInitializer(){
     
     cant_process = 0;
     char ** argv = malloc(16);
-    argv[0] = "sampleCOdeModule";
+    argv[0] = "Shell";
 
     shell_pid = create_proces(0x400000, 1, argv, 5, 1);
     if(shell_pid == -1){

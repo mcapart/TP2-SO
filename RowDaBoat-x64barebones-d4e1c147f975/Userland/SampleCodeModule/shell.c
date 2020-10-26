@@ -157,7 +157,7 @@ static void cpuInfo()
     newLine();
 }
 
-static int strComp(char *c1, char *c2)
+static int strComp(char *c1, char *c2,int* amp)
 {
     int i = 0;
     int j = 0;
@@ -172,6 +172,12 @@ static int strComp(char *c1, char *c2)
             return c1[j] - c2[i];
         }
     }
+
+    if(c2[i] == 0 && c1[j]=='&'){
+        *amp = 1;
+        j++;
+    }
+    
     while (c1[j] == ' ' && c1[j] != 0)
     {
         j++;
@@ -309,11 +315,11 @@ static int specialStrComp2(char *c1, char *c2, char *arg1, char *arg2, int isHex
     return 0;
 }
 
-static int getFunction(char *c)
+static int getFunction(char *c, int * amp)
 {
     for (int i = 0; i < CANT_FUNC - 1; i++)
     {
-        if (strComp(c, fun[i]) == 0)
+        if (strComp(c, fun[i], amp) == 0)
         {
             newLine();
             return i;
@@ -563,7 +569,8 @@ static void createLoopProces()
 
 static int startFunction(char *c)
 {
-    int i = getFunction(c);
+    int amp = 0;
+    int i = getFunction(c, &amp);
     char arg[20];
     char arg2[20];
     if (specialStrComp(c, fun[CANT_FUNC - 1], arg, 1) == 0)
@@ -700,11 +707,19 @@ static int startFunction(char *c)
     {
         char **argv = malloc(16);
         argv[0] = "phylo";
-        int pid = create_process((uint64_t)&phylo_table, 1, argv, 3, FOREGROUND);
+        if(!amp){
+            int pid = create_process((uint64_t)&phylo_table, 1, argv, 3, FOREGROUND);
+            return 1;
+        }
+        int pid = create_process((uint64_t)&phylo_table, 1, argv, 3, BACKGROUND); 
         return 1;
     }
     if (i == 18)
     {
+        if(amp){
+            print("No se puede correr cat en background, no tiene sentido...");
+            return 0;
+        }
         char **argv = malloc(16);
         argv[0] = "cat";
         int pid = create_process((uint64_t)&cat, 1, argv, 3, FOREGROUND);
@@ -712,6 +727,10 @@ static int startFunction(char *c)
     }
     if (i == 19)
     {
+        if(amp){
+            print("No se puede correr filter en background, no tiene sentido...");
+            return 0;
+        }
         char **argv = malloc(16);
         argv[0] = "filter";
         int pid = create_process((uint64_t)&filter, 1, argv, 3, FOREGROUND);
@@ -719,6 +738,10 @@ static int startFunction(char *c)
     }
      if (i == 20)
     {
+        if(amp){
+            print("No se puede correr wc en background, no tiene sentido...");
+            return 0;
+        }
         char **argv = malloc(16);
         argv[0] = "wc";
         int pid = create_process((uint64_t)&wc, 1, argv, 3, FOREGROUND);
