@@ -31,8 +31,7 @@ void sys_sleep(uint64_t rdi);
 
 uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uint64_t r8, uint64_t rax){
     switch(rax){
-        case 1: return read_fd(rdi, rsi, rdx);
-                break;
+        case 1: return (currentProcess()->fg == 1 || rdi != 0 )? read_fd(rdi, rsi, rdx): 0;
         case 2:  return write_fd(rdi,rsi, rdx);
         case 3: return malloc(rdi);
         case 4: free(rdi);

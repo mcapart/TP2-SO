@@ -5,6 +5,7 @@ int cant_process;
 int first_time = 1;
 int shell_pid;
 int func_pid;
+int cant_foreground = 0;
 
 int static errorColor[3] = {0, 0, 255};
 int static color[3]= {255, 255, 255};
@@ -18,8 +19,11 @@ typedef struct{
 
 static processState process_list[MAX_PROCESSES];
 static sleepingProcess sleeping_list[MAX_PROCESSES];
+static processState foreground_list[MAX_PROCESSES];
 
 static int find_place();
+int find_foregrounf_place();
+int find_process_foreground(uint64_t pid);
 
 void schedulerInitializer(){
     for(int i=0;i<MAX_PROCESSES;i++){
@@ -28,6 +32,11 @@ void schedulerInitializer(){
     for(int i=0;i<MAX_PROCESSES;i++){
         sleeping_list[i].pid = -1;
     }
+    for(int i=0;i<MAX_PROCESSES;i++){
+        foreground_list[i].state = EMPTY;
+    }
+    
+    
     cant_process = 0;
     char ** argv = malloc(16);
     argv[0] = "sampleCOdeModule";
@@ -41,7 +50,20 @@ void schedulerInitializer(){
     
     iterator = 0;
     
+
 }
+
+
+int find_foreground_place(){
+    for(int i = 0; i < MAX_PROCESSES; i++){
+        if(foreground_list[i].state == EMPTY){
+            return i;
+        }
+    }
+    
+    return -1;
+}
+
 
 uint8_t addToList(processStruct *process) {
     
@@ -58,8 +80,30 @@ uint8_t addToList(processStruct *process) {
     process_list[index].quantum_left = process->priority * VAR;
     cant_process++;
 
+    if(process->fg == 1){
+        int ix = find_foreground_place();
+        foreground_list[ix].process = process;
+        cant_foreground++;
+        if(cant_process > 1){
+            foreground_list[ix].state = BLOCKED;
+            
+            for(int i=0;i<MAX_PROCESSES;i++){
+                if(foreground_list[i].state == AVAILABLE){
+                    blockProcess(foreground_list[i].process->pid);
+                    return 0;
+                }
+            } 
+        }else {
+            foreground_list[ix].state = AVAILABLE;
+        }
+       
+    }
+
+
     return 0;
 } 
+
+
 
 int find_place(){
     for(int i = 0; i < MAX_PROCESSES; i++){
@@ -167,10 +211,26 @@ int kill(uint64_t pid){
     }
     process_list[processIndex].state = EMPTY;
     cant_process--;
+    if(process_list[processIndex].process->fg == 1){
+        int ix = find_process_foreground(pid);
+        if(foreground_list[ix].state == AVAILABLE){
+            int found = 0;
+            for(int i = 0; i < MAX_PROCESSES && !found;i++){
+                if(foreground_list[(i+ix)%MAX_PROCESSES].state == BLOCKED){
+                    make_available(foreground_list[(i+ix)%MAX_PROCESSES].process->pid);
+                    foreground_list[(i+ix)%MAX_PROCESSES].state = AVAILABLE;
+                    found = 1;
+                }
+            }
+        }
+        foreground_list[ix].state = EMPTY;
+        cant_foreground--;
+    }
     killProcess(process_list[processIndex].process);
     if(process_list[iterator].process->pid == pid){
         timer_interruption();
     }
+    
     return 0;
 
 
@@ -190,7 +250,21 @@ int changePriority(uint64_t pid, uint8_t newPriority ){
     return 0;
 
 }
-int hola(){};
+
+
+
+int find_process_foreground(uint64_t pid){
+    int i = 0;
+    while(i < MAX_PROCESSES ){
+        if(foreground_list[i].state != EMPTY && foreground_list[i].process->pid == pid  ){
+            return i;
+        }
+        else {
+            i++;
+        }
+    }
+    return -1;
+}
 
 int blockProcess(uint64_t pid){
     int process = find_process(pid);
@@ -198,10 +272,25 @@ int blockProcess(uint64_t pid){
         writeWord("Error while blocking the process.", 1.5, errorColor);
         return -1;
     }
+    if(process_list[process].process->fg == 1){
+        if(cant_foreground == 1){
+            return -1;
+        }
+        int pos = find_process_foreground(pid);
+        int found = 0;
+        for(int i = 0; i < MAX_PROCESSES && !found;i++){
+            if(foreground_list[(i+pos)%MAX_PROCESSES].state == BLOCKED){
+                make_available(foreground_list[(i+pos)%MAX_PROCESSES].process->pid);
+                foreground_list[(i+pos)%MAX_PROCESSES].state = AVAILABLE;
+                found = 1;
+            }
+        }
+        foreground_list[pos].state = BLOCKED;
+    }
 
     process_list[process].state = BLOCKED;
     if(process_list[iterator].process->pid == pid){
-        hola();
+      
         timer_interruption();
     }
     return 0;

@@ -97,6 +97,9 @@ int block(uint64_t pid);
 
 int unblock(uint64_t pid);
 
+int blockShell();
+
+int unblockShell();
 
   
 #endif

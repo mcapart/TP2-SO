@@ -44,8 +44,8 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority, 
     
     process->priority = priority;
 
-    process->pid = pid;
-    if(pid != 0){
+    process->pid = pid++;
+    if(pid-1 != 0){
         process->ppid = currentPid();
         processStruct * father = currentProcess(); 
         for(int i = 0; i < MAX_FD_PROCESS; i++){
@@ -85,7 +85,7 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority, 
         writeWord("Error while creating process.", 1.5, errorColor);
         return -1;
     }
-    return pid++;  
+    return pid-1;  
 }
 
 uint64_t initializeStack(uint64_t stack, uint64_t code, uint64_t argc, char ** argv, uint64_t pid){

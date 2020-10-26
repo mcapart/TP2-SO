@@ -20,13 +20,13 @@ void print_philos(){
     for(int j = 0; j < philos; j++){
         switch(phylo[j].state){
             case TERMINO:
-                print("F");
+                print("M");
                 break;
             case COMIENDO:
-                print("E");
+                print("C");
                 break;
             case PENSANDO:
-                print("T");
+                print("P");
                 break;
             case HAMBRIENTO:
                 print("H");
@@ -40,11 +40,11 @@ void print_philos(){
 }
 
 void print_tutorial(){
-    print("F representa a un filosofo va a morir.");
+    print("M representa a un filosofo que va a morir.");
     newLine();
-    print("E representa a un filosofo comiendo.");
+    print("C representa a un filosofo comiendo.");
     newLine();
-    print("T representa a un filosofo pensando.");
+    print("P representa a un filosofo pensando.");
     newLine();
     print("H representa a un filosofo hambriento.");
     newLine();
@@ -72,11 +72,7 @@ void test(int n){
         sleep(1);
 
        int aux= sem_post(phylo[n].waiter);
-       if(aux == -1){
-        print("Error ");
-        print(phylo[n].waiter);
-        newLine();
-    }
+      
     }
 }
 
@@ -85,24 +81,14 @@ void agarrar_tenedor(int n){
         return;
     }
     int aux = sem_wait(sem_table);
-    if(aux == -1){
-        print("Error1");
-        newLine();
-    }
+   
     phylo[n].state = HAMBRIENTO;
     test(n);
 
     aux = sem_post(sem_table);
-    if(aux == -1){
-        print("Error2");
-        newLine();
-    }
+   
     aux = sem_wait(phylo[n].waiter);
-    if(aux == -1){
-        print("Error3 ");
-        print(phylo[n].waiter);
-        newLine();
-    }
+
 
 }
 
@@ -111,37 +97,29 @@ void dejar_tenedor(int n){
         return;
     }
     int aux = sem_wait(sem_table);
-    if(aux == -1){
-        print("Error4");
-        newLine();
-    }
+   
     phylo[n].state = PENSANDO;
     test(left(n));
     test(right(n));
     aux = sem_post(sem_table);
-    if(aux == -1){
-        print("Error5");
-        newLine();
-    }
-
+   
 }
 
 void philosopher( int argc, char ** argv){
-    int n = argv[2];
-    print("entro ");
-    print(phylo[n].waiter);
-    print(argv[2]);
-    newLine();
+    
+  
     if(argc < 4){
         return -1;
     }
-    
+    int n = argv[2];
     phylo[n].state = PENSANDO;
     while(phylo[n].state != TERMINO){
         pensar();
         agarrar_tenedor(n);
+        print_philos();
         comer();
         dejar_tenedor(n);
+        print_philos();
     }
     
 }
@@ -149,7 +127,7 @@ void philosopher( int argc, char ** argv){
 void create_philosopher_process(){
      phylo[philos].n = philos;
         phylo[philos].state = PENSANDO;
-    //    phylo[philos].waiter = malloc(sizeof(char)*10);
+   
         numToChar(philos, phylo[philos].waiter);
         sem_open(phylo[philos].waiter, 0);
         char ** argv = malloc(sizeof(char *)*6);
@@ -157,12 +135,12 @@ void create_philosopher_process(){
          argv[1] = phylo;
          argv[2] = philos;
          argv[3] = &philos;
-         phylo[philos].pid = create_process((uint64_t)&philosopher, 4, argv, 3, 1);
+         phylo[philos].pid = create_process((uint64_t)&philosopher, 4, argv, 1, 0);
 }
 
 int phylo_table(){
-    blockShell();
-    //print_tutorial();
+    
+    print_tutorial();
     char c;
     sem_open(sem_table, 1);
     for(philos = 0; philos<MIN_PHILOSOPHERS;philos++){
@@ -207,18 +185,19 @@ int phylo_table(){
         
 
         }
-          uint64_t i = 0;
-            while(i<99999999){
-                i++;
-            }
-            print_philos();
+        uint64_t i = 0;
+        while(i<99999999){
+            i++;
+        }
         getChar(&c);
     }
     block_philos();
     kill_philos();
 
     sem_close(sem_table);
-    unblockShell();
+    print("Finalizado");
+    newLine();
+  
     return 0;
 
 
@@ -226,7 +205,7 @@ int phylo_table(){
 
 void block_philos(){
     for(int i = 0;i<philos;i++){
-        block(phylo[philos].pid);
+        block(phylo[i].pid);
     }
 }
 void kill_philos(){
