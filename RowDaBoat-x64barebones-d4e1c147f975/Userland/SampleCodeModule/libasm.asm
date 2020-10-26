@@ -37,6 +37,8 @@ GLOBAL dup2
 GLOBAL giveCPU
 GLOBAL block
 GLOBAL unblock
+GLOBAL blockShell
+GLOBAL unblockShell
 
 section .text
 
@@ -455,7 +457,29 @@ unblock:
 
     mov rsp, rbp
     pop rbp
-    ret    
+    ret   
+
+blockShell:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 36
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret   
+
+unblockShell:
+ push rbp
+    mov rbp, rsp
+    
+    mov rax, 37
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret     
 tryInvalidOpcode:
     push rbp
     mov rbp, rsp

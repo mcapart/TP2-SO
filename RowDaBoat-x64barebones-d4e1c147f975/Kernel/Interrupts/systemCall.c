@@ -59,7 +59,7 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;
         case 15: sys_saveReturn(rdi, rsi, rdx);
                 break;
-        case 16: return create_proces(rdi, rsi, rdx,rcx, rax);
+        case 16: return create_proces(rdi, rsi, rdx,rcx, r8);
         case 17: return kill(rdi);
         case 18: print_processes();
                 break;
@@ -85,6 +85,8 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;
         case 34: return blockProcess(rdi);
         case 35: return make_available(rdi);
+        case 36: return blockShell();
+        case 37: return unblockShell();
     }
     return 0;
 }

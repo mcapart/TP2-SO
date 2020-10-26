@@ -52,4 +52,7 @@ int changePriority(uint64_t pid, uint8_t newPriority );
 
 void giveCpu();
 
+int blockShell();
+int unblockShell();
+
 #endif

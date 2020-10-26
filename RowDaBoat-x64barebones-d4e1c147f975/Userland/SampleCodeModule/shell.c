@@ -2,7 +2,8 @@
 #include <stdint.h>
 #include <shell.h>  
 #include <test_util.h>
-#define CANT_FUNC 21
+#include <philosopher.h>
+#define CANT_FUNC 22
 #define FOREGROUND 1
 #define BACKGROUND 0
 
@@ -24,6 +25,7 @@ char fun[CANT_FUNC][40] = {
     "test prio",
     "test sync",
     "test no sync",
+    "phylo",
     "nice", 
     "kill", 
     "block",
@@ -47,6 +49,7 @@ char descFun[CANT_FUNC][150] = {
     ": Hace un test de los cambios de prioridad",
     ": Hace un test de semaforos",
     ": Test que muestra que pasa si no usas semafors",
+    ": Problema de los filosofos",
     ": Recibe como parametro el ID de un proceso y una nueva prioridad y le asgina a ese procesos esa prioridad",
     ": Recibe como parametro el ID de un proceso, y lo mata",
     ": Recibe como parametro el ID de un proceso, y lo bloquea",
@@ -542,6 +545,12 @@ static int startFunction(char * c){
          int pid = create_process((uint64_t)&test_no_sync, 1, argv, 2, BACKGROUND);
          return 1;
     }
+    if(i==17){
+        char ** argv = malloc(16);
+         argv[0] = "phylo";
+         int pid = create_process((uint64_t)&phylo_table, 1, argv, 3, FOREGROUND);
+         return 1;
+    }
     
 
     return 0;
@@ -555,21 +564,24 @@ int shell(){
     char text[10] = {0};
     while(text[0]!= 10 && n < 70){
         getChar(text);
-        if(text[0] == 8 && n > 0){
-            n--;
-            buffer[n] = 0;
-            deleteChar();
-        }
-       else if(text[0] == -3){
-            deleteAll(n);
-            n = 0;
-        }
-        else if(text[0] != 8)
-        {
-            buffer[n] = text[0];
-            n++;
-            print(text);
-        }
+      
+            if(text[0] == 8 && n > 0){
+                n--;
+                buffer[n] = 0;
+                deleteChar();
+            }
+            else if(text[0] == -3){
+                deleteAll(n);
+                n = 0;
+            }
+            else if(text[0] != 8)
+            {
+                buffer[n] = text[0];
+                n++;
+                print(text);
+            }
+       
+       
     }
     buffer[n-1] = 0;
     int flag = startFunction(buffer);

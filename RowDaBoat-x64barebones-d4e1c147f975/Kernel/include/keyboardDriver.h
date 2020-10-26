@@ -8,6 +8,7 @@ uint8_t hasKey(void);
 uint8_t getKey(void);
 int isLetter(const char *);
 void getNChar(char * resp, int n);
+void getChar(char * resp);
 void changeBuffer();
 
 

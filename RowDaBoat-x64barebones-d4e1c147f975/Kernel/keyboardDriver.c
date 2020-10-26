@@ -164,8 +164,18 @@ void  getNChar(char * resp, int n){
         buffer[k] = buffer[j];
     }
     actBuffer-=i;
+}
 
-  
+void getChar(char * resp){
+    resp[0] = -1;
+    if(actBuffer != 0){
+        writeChar(buffer[actBuffer], 1.5, color);
+        resp[0] = buffer[actBuffer];
+        for(int j=1, k=0;j<actBuffer;j++, k++){
+            buffer[k] = buffer[j];
+        }
+        actBuffer--;
+    }
 }
 
 void changeBuffer(){

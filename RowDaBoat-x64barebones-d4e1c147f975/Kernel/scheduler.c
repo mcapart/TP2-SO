@@ -327,3 +327,17 @@ void giveCpu(){
     timer_interruption();
     return;
 }
+
+int blockShell(){
+   
+    int ix = find_process(shell_pid);
+    process_list[0].state = BLOCKED;
+  
+    return 0;
+}
+
+int unblockShell(){
+    int ix = find_process(shell_pid);
+    process_list[0].state = AVAILABLE;
+    return 0;
+}
