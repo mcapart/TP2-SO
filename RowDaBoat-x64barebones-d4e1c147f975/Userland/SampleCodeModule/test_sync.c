@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <lib.h>
 
-
+#define N 1000000
 #define TOTAL_PAIR_PROCESSES 2
 #define SEM_ID "sem"
 
@@ -36,7 +36,7 @@ void inc(uint64_t argc, char ** argv){
   uint64_t i;
   uint64_t sem = (uint64_t) argv[1];
   int64_t value = (int64_t) argv[2];
-  uint64_t N = (uint64_t) argv[3];
+  uint64_t n = (uint64_t) argv[3];
   if (sem && !my_sem_open(SEM_ID, 1)){
     print("ERROR OPENING SEM");
     newLine();
@@ -60,7 +60,7 @@ void inc(uint64_t argc, char ** argv){
 }
 
 
-static uint32_t my_create_process(char * name, uint64_t sem, int64_t value, uint64_t N){
+static uint32_t my_create_process(char * name, uint64_t sem, int64_t value, uint64_t n){
    char ** argv = malloc(16);
     argv[0] = "test_loop";
     argv[1] = (char *) sem;
@@ -84,8 +84,8 @@ void test_sync(){
   newLine();
 
   for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
-    my_create_process("inc", 1, 1, 10);
-    my_create_process("inc", 1, -1, 10);
+    my_create_process("inc", 1, 1, N);
+    my_create_process("inc", 1, -1, N);
   }
 }
 
@@ -97,8 +97,8 @@ void test_no_sync(){
   print("CREATING PROCESSES...(WITHOUT SEM)");
 
   for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
-    my_create_process("inc", 0, 1, 3);
-    my_create_process("inc", 0, -1, 3);
+    my_create_process("inc", 0, 1, N);
+    my_create_process("inc", 0, -1, N);
   }
 }
 
