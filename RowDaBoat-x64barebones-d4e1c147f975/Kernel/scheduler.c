@@ -217,7 +217,8 @@ int kill(uint64_t pid){
             int found = 0;
             for(int i = 0; i < MAX_PROCESSES && !found;i++){
                 if(foreground_list[(i+ix)%MAX_PROCESSES].state == BLOCKED){
-                    make_available(foreground_list[(i+ix)%MAX_PROCESSES].process->pid);
+                    int aux = find_process(foreground_list[(i+ix)%MAX_PROCESSES].process->pid);
+                    process_list[aux].state = AVAILABLE;
                     foreground_list[(i+ix)%MAX_PROCESSES].state = AVAILABLE;
                     found = 1;
                 }
@@ -280,7 +281,8 @@ int blockProcess(uint64_t pid){
         int found = 0;
         for(int i = 0; i < MAX_PROCESSES && !found;i++){
             if(foreground_list[(i+pos)%MAX_PROCESSES].state == BLOCKED){
-                make_available(foreground_list[(i+pos)%MAX_PROCESSES].process->pid);
+                int ix = find_process(foreground_list[(i+pos)%MAX_PROCESSES].process->pid);
+                process_list[ix].state=AVAILABLE;
                 foreground_list[(i+pos)%MAX_PROCESSES].state = AVAILABLE;
                 found = 1;
             }
@@ -309,6 +311,7 @@ int sleepProcess(uint64_t sec){
     sleeping_list[i].tick_left = sec * 18;
     
     blockProcess(process_list[iterator].process->pid);
+    return 0;
 }
 
 int find_process(uint64_t pid){
@@ -401,14 +404,30 @@ int switch_state( int pid ){
 
 int make_available(int pid){
     int processIndex = find_process(pid);
+    int blockFG = 0;
     if(processIndex == -1){
         writeWord("Error. The PID given is unknown\n", 1.5, errorColor);
         return -1;
-    } 
-    else{
-       process_list[processIndex].state = AVAILABLE;
-       return 0;
     }
+    if(process_list[processIndex].process->fg){
+        for(int i=0;i<MAX_PROCESSES;i++){
+            if(foreground_list[i].state==AVAILABLE){
+                foreground_list[i].state = BLOCKED;
+                int ix = find_process(foreground_list[i].process->pid);
+                process_list[ix].state=BLOCKED;
+                if(foreground_list[i].process->pid == process_list[iterator].process->pid){
+                    blockFG = 1;
+                }
+            }else if(foreground_list[i].process->pid == pid){
+                foreground_list[i].state = AVAILABLE;
+            }
+        }
+    }
+    process_list[processIndex].state = AVAILABLE;
+    if(blockFG){
+        timer_interruption();
+    }
+    return 0;
 }
 
 void giveCpu(){
@@ -417,16 +436,4 @@ void giveCpu(){
     return;
 }
 
-int blockShell(){
-   
-    int ix = find_process(shell_pid);
-    process_list[0].state = BLOCKED;
-  
-    return 0;
-}
 
-int unblockShell(){
-    int ix = find_process(shell_pid);
-    process_list[0].state = AVAILABLE;
-    return 0;
-}

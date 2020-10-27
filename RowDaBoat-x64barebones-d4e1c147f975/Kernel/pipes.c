@@ -83,15 +83,26 @@ int pipe(char * name){
  
 }
 
+int addProcess(int fd){
+    if(fd_list[fd] != NULL){
+        return fd_list[fd]->process_counter++;
+    }
+    return -1;
+}
+
 int closeFD(int fd){
     if(fd < 0 || fd >= MAX_FD || fd_list[fd] == NULL){
         return -1;
     }
+    
     remove_fd_process(fd);
     fd_list[fd]->process_counter--;
     if(fd_list[fd]->process_counter > 0){
         return 0;
     }
+    sem_close(fd_list[fd]->sem_r->name);
+    sem_close(fd_list[fd]->sem_w->name);
+
     free(fd_list[fd]);
     fd_list[fd] = NULL;
     return 0;
@@ -180,7 +191,7 @@ void print_pipes(){
                 numToChar( temp->pid, num2);
                 writeWord(num2, 1.5, color);
                 newLine();
-                temp = temp->next;
+                temp = (block_queue *) temp->next;
                 j++;
             }
             writeWord("Blocked by sem_write: ", 1.5, color);
@@ -197,7 +208,7 @@ void print_pipes(){
                 numToChar( temp->pid, num3);
                 writeWord(num3, 1.5, color);
                 newLine();
-                temp = temp->next;
+                temp = (block_queue *) temp->next;
                 
             }
             newLine();

@@ -34,9 +34,9 @@ static uint64_t my_sem_close(char *sem_id){
 
 void inc(uint64_t argc, char ** argv){
   uint64_t i;
-  uint64_t sem = argv[1];
-  int64_t value = argv[2];
-  uint64_t N = argv[3];
+  uint64_t sem = (uint64_t) argv[1];
+  int64_t value = (int64_t) argv[2];
+  uint64_t N = (uint64_t) argv[3];
   if (sem && !my_sem_open(SEM_ID, 1)){
     print("ERROR OPENING SEM");
     newLine();
@@ -63,9 +63,9 @@ void inc(uint64_t argc, char ** argv){
 static uint32_t my_create_process(char * name, uint64_t sem, int64_t value, uint64_t N){
    char ** argv = malloc(16);
     argv[0] = "test_loop";
-    argv[1] = sem;
-    argv[2] = value;
-    argv[3] = N;
+    argv[1] = (char *) sem;
+    argv[2] = (char *) value;
+    argv[3] = (char *) N;
 
     return create_process((uint64_t)&inc, 4, argv, 1, 0);
 

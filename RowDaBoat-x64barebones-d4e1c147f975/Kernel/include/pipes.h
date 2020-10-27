@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <lib.h>
 #include <keyboardDriver.h>
+#include <proces.h>
 
 #define MAX_LENGTH_NAME_FD 40
 #define MAX_LENGTH_BUFFER_FD 200
@@ -30,6 +31,8 @@ typedef struct fd_struct{
 
 void fd_init();
 
+int addProces(int fd);
+
 fd_struct * addFD(char * name, int isPipe);
 
 int pipe(char * name);
@@ -39,6 +42,8 @@ int read_fd(int fd,  char * str, int length);
 void print_pipes();
 
 int closeFD(int fd);
+
+int addProcess(int fd);
 
 int write_fd(int fd, const char * str, int length);
 #endif

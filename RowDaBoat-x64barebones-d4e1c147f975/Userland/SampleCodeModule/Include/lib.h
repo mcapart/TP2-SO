@@ -52,7 +52,7 @@ void * malloc(uint64_t size);
 
 void free(void * add);
 
-uint64_t create_process(uint64_t codeEntry, uint64_t argc, uint64_t argv, uint8_t priority, uint8_t fg);
+uint64_t create_process(uint64_t codeEntry, uint64_t argc, char ** argv, uint8_t priority, uint8_t fg);
 
 uint64_t kill(uint64_t pid);
 
@@ -89,7 +89,7 @@ int close_pipe(int fd);
 
 void  print_pipes();
             
-void dup2(int fd1, int fd2);
+int dup2(int fd1, int fd2);
 
 void giveCPU();
 
@@ -97,9 +97,7 @@ int block(uint64_t pid);
 
 int unblock(uint64_t pid);
 
-int blockShell();
 
-int unblockShell();
 
   
 #endif

@@ -4,6 +4,7 @@
 #include <lib.h>
 #include <proces.h>
 #include <scheduler.h>
+#include <memory_manager.h>
 
 
 static int check_name(char * name);
@@ -86,7 +87,7 @@ int sem_post(char * name){
     
             //tendria que estar bloqueado entonces cambia a available
         }
-        sem_list[index]->first_blocked_process = sem_list[index]->first_blocked_process->next;
+        sem_list[index]->first_blocked_process = (block_queue *) sem_list[index]->first_blocked_process->next;
         free(blocked_process);
         sem_list[index]->value++;
                 
@@ -122,9 +123,9 @@ int sem_wait(char * name){
         }else{
             block_queue * temp = sem_list[index]->first_blocked_process;
             while(temp->next != NULL){
-                temp = temp->next;
+                temp =(block_queue * ) temp->next;
             }
-            temp->next = blocked_process;
+            temp->next = (struct block_queue * )  blocked_process;
         } 
         sem_list[index]->value--;
         release(&(sem_list[index]->lock));
@@ -214,7 +215,7 @@ void print_sem(){
                 numToChar(pid, num);
                 writeWord(num, 1.5, color);
                 newLine();
-                temp = temp->next;
+                temp = (block_queue * ) temp->next;
             }
             newLine();
             

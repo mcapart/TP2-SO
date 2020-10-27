@@ -36,7 +36,7 @@ uint64_t initializeStack(uint64_t stack, uint64_t code, uint64_t argc, char ** a
 
 uint64_t killProcess(processStruct * process);
 
-void dup2(int fd1, int fd2);
+int dup2(int fd1, int fd2);
 
 int getRealFD(int fd);
 

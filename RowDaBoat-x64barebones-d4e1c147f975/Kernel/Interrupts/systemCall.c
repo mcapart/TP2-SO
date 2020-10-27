@@ -31,10 +31,10 @@ void sys_sleep(uint64_t rdi);
 
 uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uint64_t r8, uint64_t rax){
     switch(rax){
-        case 1: return (currentProcess()->fg == 1 || rdi != 0 )? read_fd(rdi, rsi, rdx): 0;
-        case 2:  return write_fd(rdi,rsi, rdx);
-        case 3: return malloc(rdi);
-        case 4: free(rdi);
+        case 1: return (currentProcess()->fg == 1 || getRealFD((int)rdi) != 0 )? read_fd(rdi,(char*) rsi, rdx): 0;
+        case 2:  return write_fd(rdi,(char *)rsi, rdx);
+        case 3: return (uint64_t) malloc(rdi);
+        case 4: free((void *)rdi);
                 break;      
         case 5: sys_delete();
                 break;
@@ -58,7 +58,7 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;
         case 15: sys_saveReturn(rdi, rsi, rdx);
                 break;
-        case 16: return create_proces(rdi, rsi, rdx,rcx, r8);
+        case 16: return create_proces(rdi, rsi, (char **)rdx,rcx, r8);
         case 17: return kill(rdi);
         case 18: print_processes();
                 break;
@@ -68,24 +68,22 @@ uint64_t systemCall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,  uin
                 break;   
         case 22: return changePriority(rdi, rsi); 
         case 23: return usedMem();
-        case 24: return sem_open(rdi, rsi);
-        case 25: return sem_close(rdi);
-        case 26: return sem_wait(rdi);
-        case 27: return sem_post(rdi);
+        case 24: return (uint64_t) sem_open((char *)rdi, rsi);
+        case 25: return sem_close((char *)rdi);
+        case 26: return sem_wait((char *)rdi);
+        case 27: return sem_post((char *)rdi);
         case 28: print_sem();
                 break;
-        case 29: return pipe(rdi);
+        case 29: return pipe((char *)rdi);
         case 30: return closeFD(rdi);
         case 31: print_pipes();
                 break;
-        case 32: dup2(rdi, rsi);
-                break;
+        case 32: return dup2(rdi, rsi);
         case 33: giveCpu();
                 break;
         case 34: return blockProcess(rdi);
         case 35: return make_available(rdi);
-        case 36: return blockShell();
-        case 37: return unblockShell();
+
     }
     return 0;
 }

@@ -6,7 +6,7 @@ void kill_philos();
 
 char * sem_table = "philo_sem";
 phylo_struct phylo[MAX_PHILOSOPHERS];
-int philos = 0;
+uint64_t philos = 0;
 
 int left(int n){
     return (n+ philos-1) % philos;
@@ -36,6 +36,7 @@ void print_philos(){
                 break;
         }
     }
+    
     newLine();
 }
 
@@ -52,7 +53,7 @@ void print_tutorial(){
     newLine();
     print("presionar \"r\" para remover a un nuevo filosofo de la mesa (a menos que hayan la minima cantidad de filosofos sentados).");
     newLine();
-    print("presionar \"q\" para terminar el proceso.");
+    print("presionar \"q\" para terminar el proceso.$");
     newLine();
 }
 
@@ -71,7 +72,7 @@ void test(int n){
         phylo[n].state = COMIENDO;
         sleep(1);
 
-       int aux= sem_post(phylo[n].waiter);
+       sem_post(phylo[n].waiter);
       
     }
 }
@@ -80,14 +81,14 @@ void agarrar_tenedor(int n){
     if(phylo[n].state == TERMINO){
         return;
     }
-    int aux = sem_wait(sem_table);
+    sem_wait(sem_table);
    
     phylo[n].state = HAMBRIENTO;
     test(n);
 
-    aux = sem_post(sem_table);
+    sem_post(sem_table);
    
-    aux = sem_wait(phylo[n].waiter);
+    sem_wait(phylo[n].waiter);
 
 
 }
@@ -96,12 +97,12 @@ void dejar_tenedor(int n){
     if(phylo[n].state == TERMINO){
         return;
     }
-    int aux = sem_wait(sem_table);
+    sem_wait(sem_table);
    
     phylo[n].state = PENSANDO;
     test(left(n));
     test(right(n));
-    aux = sem_post(sem_table);
+    sem_post(sem_table);
    
 }
 
@@ -109,9 +110,9 @@ void philosopher( int argc, char ** argv){
     
   
     if(argc < 4){
-        return -1;
+        return;
     }
-    int n = argv[2];
+    uint64_t n = (uint64_t) argv[2];
     phylo[n].state = PENSANDO;
     while(phylo[n].state != TERMINO){
         pensar();
@@ -132,11 +133,12 @@ void create_philosopher_process(){
         sem_open(phylo[philos].waiter, 0);
         char ** argv = malloc(sizeof(char *)*6);
          argv[0] = "philosopher";
-         argv[1] = phylo;
-         argv[2] = philos;
-         argv[3] = &philos;
+         argv[1] = (char *)phylo;
+         argv[2] = (char *) philos;
+         argv[3] = (char *)&philos;
          phylo[philos].pid = create_process((uint64_t)&philosopher, 4, argv, 1, 0);
 }
+
 
 int phylo_table(){
     
@@ -146,12 +148,13 @@ int phylo_table(){
     for(philos = 0; philos<MIN_PHILOSOPHERS;philos++){
         create_philosopher_process();
     }
-    print("Comenzando a comer");
+    print("Comenzando a comer$");
     newLine();
     newLine();
     getChar(&c);
     while( c!='q') {
         if(c == 'a'){
+           
             sem_wait(sem_table);  
             if(philos < MAX_PHILOSOPHERS){
                 
@@ -166,11 +169,14 @@ int phylo_table(){
                 newLine();
             }
             sem_post(sem_table);
+           
 
         }
         if(c == 'r'){
             sem_wait(sem_table);
             if(philos > MIN_PHILOSOPHERS){
+                print("ELIMINANDO");
+                newLine();
                 philos--;
                 phylo[philos].state = TERMINO;
                 kill(phylo[philos].pid);

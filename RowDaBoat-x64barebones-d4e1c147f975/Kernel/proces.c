@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <video_driver.h>
 #include <scheduler.h>
+#include <pipes.h>
 
 
 
@@ -49,8 +50,11 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority, 
         process->ppid = currentPid();
         processStruct * father = currentProcess(); 
         for(int i = 0; i < MAX_FD_PROCESS; i++){
-            process->fd_array[i][0] = father->fd_array[i][0];
-            process->fd_array[i][1] = father->fd_array[i][1];
+            process->fd_array[i][0] = father->fd_array[i][0]; 
+            process->fd_array[i][1] = father->fd_array[i][1]; 
+            if(process->fd_array[i][0] != -1 && i>2){
+                addProcess(process->fd_array[i][0]);
+            }
         }
     }else{
         process->ppid = -1;
@@ -91,7 +95,7 @@ int create_proces(uint64_t codeEntry, int argc, char ** argv, uint8_t priority, 
 uint64_t initializeStack(uint64_t stack, uint64_t code, uint64_t argc, char ** argv, uint64_t pid){
     uint64_t sp = stack-20*8;
     initStack[ARGC] = argc;
-    initStack[ARGV] = argv;
+    initStack[ARGV] = (uint64_t) argv;
     initStack[STACK] = stack;
     initStack[PID] = pid;
     initStack[CODE] = code;
@@ -102,6 +106,14 @@ uint64_t initializeStack(uint64_t stack, uint64_t code, uint64_t argc, char ** a
 }
 
 uint64_t killProcess(processStruct * process){
+     for(int i = 3; i < MAX_FD_PROCESS; i++){
+            if(process->fd_array[i][0] != -1){
+                closeFD(process->fd_array[i][0]);
+            }
+        }
+
+
+
     free((void*)process->argv);
     free((void *)process->MemPointer);
     free(process);
@@ -122,7 +134,7 @@ int add_fd_process(int fd, processStruct * p){
     return -1;
 }
 
-void dup2(int fd1, int fd2){
+int dup2(int fd1, int fd2){
     processStruct * p = currentProcess();
     if(p == NULL){
         return -1;

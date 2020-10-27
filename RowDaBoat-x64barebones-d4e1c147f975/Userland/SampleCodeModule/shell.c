@@ -3,6 +3,7 @@
 #include <shell.h>
 #include <test_util.h>
 #include <philosopher.h>
+#include <stddef.h>
 #define CANT_FUNC 25
 #define FOREGROUND 1
 #define BACKGROUND 0
@@ -28,7 +29,7 @@ char fun[CANT_FUNC][40] = {
     "test no sync",
     "phylo",
     "cat",
-    "filet",
+    "filter",
     "wc",
     "nice",
     "kill",
@@ -321,9 +322,9 @@ static int getFunction(char *c, int * amp)
     {
         if (strComp(c, fun[i], amp) == 0)
         {
-            newLine();
             return i;
         }
+        
     }
     return -1;
 }
@@ -399,9 +400,8 @@ static void loop()
     //cada 5 o 10 segundos imprime
 
     char num[20];
-    int i = 0;
-    uint64_t j;
-    while (i < 15)
+    
+    while (1)
     {
         /* j=0;
         while(j<99999999){
@@ -412,9 +412,12 @@ static void loop()
         print("Hola! :) este es mi PID: ");
         numToChar(pid, num);
         print(num);
+        print("$");
         newLine();
-        i++;
+
+        
     }
+    
 }
 
 static void cat()
@@ -463,6 +466,7 @@ static void cat()
     }
 }
 
+
 int isVocal(char a)
 {
     return (a == 'a' || a == 'A' || a == 'e' || a == 'E' || a == 'i' || a == 'I' || a == 'o' || a == 'O' || a == 'u' || a == 'U');
@@ -470,50 +474,57 @@ int isVocal(char a)
 
 static void filter()
 {
-    char buffer[MAX_CAT] = {0};
+    while(1){
+        char buffer[MAX_CAT] = {0};
 
-    int i = 0;
-    char *buff = buffer;
-    do
-    {
-        read(0, buff, 1);
-        if (buffer[i] == 10)
+        int i = 0;
+        char *buff = buffer;
+        do
         {
-            newLine();
-        }
-        if (buffer[i] == 8 && i > 0)
-        {
-            i--;
-            buff--;
-            buffer[i] = 0;
-            deleteChar();
-        }
-        else
-        {
-            write(1, buff, 1);
-        }
-        buff++;
-        i++;
-    } while (i < MAX_CAT && buffer[i - 1] != '$');
-
-    newLine();
-    int j = 0;
-    buff = buffer;
-    while (j < i && buffer[j] != '$')
-    {
-        if (*buff == 10)
-        {
-            newLine();
-        }
-        else
-        {
-            if (!isVocal(*buff))
+            read(0, buff, 1);
+            if(buffer[i] == '#'){
+                return;
+            }
+            if (buffer[i] == 10)
+            {
+                newLine();
+            }
+            if (buffer[i] == 8 && i > 0)
+            {
+                i--;
+                buff--;
+                buffer[i] = 0;
+                deleteChar();
+            }
+            else
             {
                 write(1, buff, 1);
             }
+            buff++;
+            i++;
+        } while (i < MAX_CAT && buffer[i - 1] != '$');
+
+        newLine();
+        int j = 0;
+        buff = buffer;
+        while (j < i && buffer[j] != '$')
+        {
+            if (*buff == 10)
+            {
+                newLine();
+            }
+            else
+            {
+                if (!isVocal(*buff))
+                {
+                    write(1, buff, 1);
+                }
+            }
+            buff++;
+            j++;
         }
-        buff++;
-        j++;
+        newLine();
+        newLine();
     }
 }
 
@@ -551,7 +562,7 @@ static void wc()
     newLine();
     char num[20] = {0};
     numToChar(lines, num);
-    print("Cnatidad de lines: ");
+    print("Cantidad de lines: ");
     print(num);
     newLine();
    
@@ -564,12 +575,110 @@ static void createLoopProces()
     newLine();
     char **argv = malloc(16);
     argv[0] = "loop";
-    int pid = create_process((uint64_t)&loop, 1, argv, 1, BACKGROUND);
+    create_process((uint64_t)&loop, 1, argv, 1, BACKGROUND);
+}
+
+char * isPipeThere(char* c){
+    if(*c == '!'){
+        return NULL;
+    }
+    for(; *c !=0;){
+        if(*c == '!'){
+            *c = 0;
+            c++;
+            return c;
+        }
+        c++;
+    }
+    return NULL;
 }
 
 static int startFunction(char *c)
 {
-    int amp = 0;
+     int amp = 0;
+    char * c1 = isPipeThere(c);
+    if(c1 != NULL){
+        int left = getFunction(c, &amp);
+        int right = getFunction(c1, &amp);
+        if(left == -1 || right == -1){
+            newLine();
+            return 0;
+        }
+        
+        if(left == 8){
+            if(right == 19){
+                int fd = pipe("loop_pipe");
+                int aux;
+                aux = dup2(fd, 1);
+                if(aux == -1){
+                    print("Algo malo");
+                }
+                char **argv2 = malloc(16);
+                argv2[0] = "loop";
+                create_process((uint64_t)&loop, 1, argv2, 3, BACKGROUND);
+                aux =dup2(1, 1);
+                if(aux == -1){
+                    print("Algo malo 2");
+                }
+                aux = dup2(fd, 0);
+                if(aux == -1){
+                    print("Algo malo");
+                }    
+                char **argv = malloc(16);
+                argv[0] = "filter";
+                create_process((uint64_t)&filter, 1, argv, 3, BACKGROUND);
+                dup2(0, 0);
+                close_pipe(fd);
+                return 1;
+            }
+            if(right == 20){
+                int fd = pipe("loop_pipe");
+                dup2(fd, 1);
+
+                createLoopProces();
+                dup2(1, 1);
+                dup2(fd, 0);    
+                char **argv = malloc(16);
+                argv[0] = "wc";
+                create_process((uint64_t)&wc, 1, argv, 3, BACKGROUND);
+                dup2(0, 0);
+                return 1;
+                
+            }
+        }
+        if(left == 17){
+            if(right ==19){
+                int fd = pipe("phylo_pipe");
+                dup2(fd, 1);
+                char **argv = malloc(16);
+                argv[0] = "phylo";
+                create_process((uint64_t)&phylo_table, 1, argv, 3, BACKGROUND);
+                dup2(1, 1);
+                dup2(fd, 0);
+                char **argv2 = malloc(16);
+                argv2[0] = "filter";
+                create_process((uint64_t)&filter, 1, argv2, 3, BACKGROUND);
+                dup2(0, 0);
+                return 1;
+
+            }
+            if(right == 20){
+                int fd = pipe("phylo_pipe");
+                dup2(fd, 1);
+                char **argv = malloc(16);
+                argv[0] = "phylo";
+                create_process((uint64_t)&phylo_table, 1, argv, 3, BACKGROUND);
+                dup2(1, 1);
+                dup2(fd, 0);    
+                char **argv2 = malloc(16);
+                argv2[0] = "wc";
+                create_process((uint64_t)&wc, 1, argv2, 3, BACKGROUND);
+                dup2(0, 0);
+                return 1;
+            }
+        }
+        return 0;
+    }
     int i = getFunction(c, &amp);
     char arg[20];
     char arg2[20];
@@ -672,35 +781,35 @@ static int startFunction(char *c)
     {
         char **argv = malloc(16);
         argv[0] = "test mm";
-        int pid = create_process((uint64_t)&test_mm, 1, argv, 1, BACKGROUND);
+        create_process((uint64_t)&test_mm, 1, argv, 1, BACKGROUND);
         return 1;
     }
     if (i == 13)
     {
         char **argv = malloc(16);
         argv[0] = "test process";
-        int pid = create_process((uint64_t)&test_processes, 1, argv, 1, BACKGROUND);
+        create_process((uint64_t)&test_processes, 1, argv, 1, BACKGROUND);
         return 1;
     }
     if (i == 14)
     {
         char **argv = malloc(16);
         argv[0] = "test prio";
-        int pid = create_process((uint64_t)&test_prio, 1, argv, 2, BACKGROUND);
+        create_process((uint64_t)&test_prio, 1, argv, 2, BACKGROUND);
         return 1;
     }
     if (i == 15)
     {
         char **argv = malloc(16);
         argv[0] = "test sync";
-        int pid = create_process((uint64_t)&test_sync, 1, argv, 2, BACKGROUND);
+        create_process((uint64_t)&test_sync, 1, argv, 2, BACKGROUND);
         return 1;
     }
     if (i == 16)
     {
         char **argv = malloc(16);
         argv[0] = "test no sync";
-        int pid = create_process((uint64_t)&test_no_sync, 1, argv, 2, BACKGROUND);
+        create_process((uint64_t)&test_no_sync, 1, argv, 2, BACKGROUND);
         return 1;
     }
     if (i == 17)
@@ -708,10 +817,10 @@ static int startFunction(char *c)
         char **argv = malloc(16);
         argv[0] = "phylo";
         if(!amp){
-            int pid = create_process((uint64_t)&phylo_table, 1, argv, 3, FOREGROUND);
+            create_process((uint64_t)&phylo_table, 1, argv, 3, FOREGROUND);
             return 1;
         }
-        int pid = create_process((uint64_t)&phylo_table, 1, argv, 3, BACKGROUND); 
+        create_process((uint64_t)&phylo_table, 1, argv, 3, BACKGROUND); 
         return 1;
     }
     if (i == 18)
@@ -722,7 +831,7 @@ static int startFunction(char *c)
         }
         char **argv = malloc(16);
         argv[0] = "cat";
-        int pid = create_process((uint64_t)&cat, 1, argv, 3, FOREGROUND);
+        create_process((uint64_t)&cat, 1, argv, 3, FOREGROUND);
         return 1;
     }
     if (i == 19)
@@ -733,7 +842,7 @@ static int startFunction(char *c)
         }
         char **argv = malloc(16);
         argv[0] = "filter";
-        int pid = create_process((uint64_t)&filter, 1, argv, 3, FOREGROUND);
+        create_process((uint64_t)&filter, 1, argv, 3, FOREGROUND);
         return 1;
     }
      if (i == 20)
@@ -744,7 +853,7 @@ static int startFunction(char *c)
         }
         char **argv = malloc(16);
         argv[0] = "wc";
-        int pid = create_process((uint64_t)&wc, 1, argv, 3, FOREGROUND);
+        create_process((uint64_t)&wc, 1, argv, 3, FOREGROUND);
         return 1;
     }
     
@@ -779,6 +888,7 @@ int shell()
         }
     }
     buffer[n - 1] = 0;
+    newLine();
     int flag = startFunction(buffer);
     newLine();
     if (!flag)
